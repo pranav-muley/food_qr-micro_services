@@ -1,0 +1,27 @@
+
+  version: "3.8"
+  services:
+    server:
+      build:
+        context: .
+      container_name: auth-service
+      ports:
+        - "8088:8088"
+      environment:
+        APP_QR_SECRET: "TnsLD53NKeFsHhZ73ojREN9XLT8dIuuvmeSh/f3FU2KF7q4m11nf/PJivEuplO9U4tZDUW0JPPByW2VHOU2HMQ=="
+        SPRING_REDIS_HOST: redis
+        SPRING_REDIS_PORT: 6379
+      depends_on:
+        - redis
+
+    redis:
+      image: redis:7
+      container_name: redis
+      restart: always
+      ports:
+        - "6379:6379"
+      volumes:
+        - redis-data:/data
+
+  volumes:
+    redis-data:
