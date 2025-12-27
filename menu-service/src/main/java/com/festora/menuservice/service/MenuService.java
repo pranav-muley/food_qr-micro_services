@@ -5,6 +5,8 @@ import com.festora.menuservice.entity.MenuItem;
 import com.festora.menuservice.repository.CategoryRepo;
 import com.festora.menuservice.repository.MenuItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +18,7 @@ public class MenuService {
     private final CategoryRepo categoryRepo;
     private final MenuItemRepository itemRepo;
 
+    @Cacheable(value = "menuCache", key = "#restaurantId")
     public List<Category> getMenuByRestaurant(Long restaurantId) {
 
         List<Category> categories =
@@ -28,6 +31,11 @@ public class MenuService {
         }
 
         return categories;
+    }
+
+    @CacheEvict(value = "menuCache", key = "#restaurantId")
+    public void refreshMenu(Long restaurantId) {
+
     }
 }
 

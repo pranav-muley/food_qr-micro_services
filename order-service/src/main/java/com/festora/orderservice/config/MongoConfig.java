@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
 public class MongoConfig {
-    @Value("${spring.data.mongodb.uri:}")
+    @Value("${mongodb.uri:}")
     private String mongoUrl;
 
     public MongoClient mongoClient(){
@@ -29,6 +29,6 @@ public class MongoConfig {
 
     @Bean
     public MongoTemplate mongoTemplate(){
-        return new MongoTemplate(mongoClient(), "orders");
+        return new MongoTemplate(mongoClient(), "order");
     }
 }
