@@ -1,0 +1,20 @@
+[
+  {
+    "id": "CAT001",
+    "restaurantId": 101,
+    "name": "Chinese",
+    "description": "Indo-Chinese favourites"
+  },
+  {
+    "id": "CAT002",
+    "restaurantId": 101,
+    "name": "Biryani",
+    "description": "Slow cooked aromatic rice bowls"
+  },
+  {
+    "id": "CAT003",
+    "restaurantId": 101,
+    "name": "Beverages",
+    "description": "Refreshing cold and hot drinks"
+  }
+]

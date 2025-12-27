@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ITEM001",
+    "restaurantId": 101,
+    "categoryId": "CAT001",
+    "name": "Veg Hakka Noodles",
+    "description": "Stir-fried noodles with seasonal vegetables",
+    "price": 160.0,
+    "veg": true,
+    "isAvailable": true,
+    "addons": [
+      { "name": "Extra Sauce", "price": 20.0 }
+    ],
+    "variants": [
+      { "label": "Half", "price": 99.0 },
+      { "label": "Full", "price": 160.0 }
+    ]
+  },
+  {
+    "id": "ITEM002",
+    "restaurantId": 101,
+    "categoryId": "CAT001",
+    "name": "Chicken Manchurian",
+    "description": "Crispy chicken tossed in spicy Manchurian sauce",
+    "price": 220.0,
+    "veg": false,
+    "isAvailable": true,
+    "addons": [
+      { "name": "Extra Gravy", "price": 25.0 }
+    ],
+    "variants": [
+      { "label": "Dry", "price": 220.0 },
+      { "label": "Gravy", "price": 230.0 }
+    ]
+  },
+  {
+    "id": "ITEM003",
+    "restaurantId": 101,
+    "categoryId": "CAT002",
+    "name": "Paneer Biryani",
+    "description": "Spiced paneer layered with basmati rice",
+    "price": 199.0,
+    "veg": true,
+    "isAvailable": true,
+    "addons": [
+      { "name": "Raita", "price": 20.0 }
+    ],
+    "variants": []
+  },
+  {
+    "id": "ITEM004",
+    "restaurantId": 101,
+    "categoryId": "CAT003",
+    "name": "Fresh Lime Soda",
+    "description": "Sweet or salted — your choice",
+    "price": 69.0,
+    "veg": true,
+    "isAvailable": true,
+    "addons": [],
+    "variants": []
+  }
+]

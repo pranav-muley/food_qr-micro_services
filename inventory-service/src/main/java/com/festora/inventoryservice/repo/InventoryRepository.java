@@ -10,8 +10,7 @@ import java.util.Optional;
 public interface InventoryRepository extends JpaRepository<InventoryItem, Long> {
 
     Optional<InventoryItem> findByMenuItemIdAndVariantId(
-            String menuItemId,
-            String variantId
+            String menuItemId, String variantId
     );
 
 }

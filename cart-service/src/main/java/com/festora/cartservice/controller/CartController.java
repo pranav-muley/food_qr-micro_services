@@ -17,10 +17,8 @@ public class CartController {
     }
 
     @PostMapping("/items")
-    public Cart addItem(
-            @RequestHeader("X-Session-Id") String sessionId,
-            @RequestBody AddItemRequest req
-    ) {
+    public Cart addItem(@RequestHeader("X-Session-Id") String sessionId,
+                        @RequestBody AddItemRequest req) {
         CartItem item = new CartItem(
                 req.getItemId(),
                 req.getName(),

@@ -1,32 +1,35 @@
 package com.festora.menuservice.entity;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "menu_items")
+@Document("menu_items")
 public class MenuItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
+    @Indexed
     private Long restaurantId;
+
+    @Indexed
+    private String categoryId;
+
     private String name;
     private String description;
-    private double price;
-    private boolean available = true;
+    private Double price;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    private Boolean veg;
+    private Boolean isAvailable;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    private List<Variant> variants;
+    private List<Addon> addons;
 }
-
