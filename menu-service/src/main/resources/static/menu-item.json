@@ -1,62 +1,97 @@
 [
   {
-    "id": "ITEM001",
+    "_id": "ITEM001",
     "restaurantId": 101,
     "categoryId": "CAT001",
     "name": "Veg Hakka Noodles",
     "description": "Stir-fried noodles with seasonal vegetables",
-    "price": 160.0,
+    "basePrice": 160,
     "veg": true,
-    "isAvailable": true,
-    "addons": [
-      { "name": "Extra Sauce", "price": 20.0 }
-    ],
+    "enabled": true,
     "variants": [
-      { "label": "Half", "price": 99.0 },
-      { "label": "Full", "price": 160.0 }
+      {
+        "id": "VAR001",
+        "label": "Half",
+        "price": 99,
+        "available": true
+      },
+      {
+        "id": "VAR002",
+        "label": "Full",
+        "price": 160,
+        "available": true
+      }
+    ],
+    "addons": [
+      {
+        "id": "ADD001",
+        "name": "Extra Sauce",
+        "price": 20,
+        "available": true
+      }
     ]
   },
   {
-    "id": "ITEM002",
+    "_id": "ITEM002",
     "restaurantId": 101,
     "categoryId": "CAT001",
     "name": "Chicken Manchurian",
     "description": "Crispy chicken tossed in spicy Manchurian sauce",
-    "price": 220.0,
+    "basePrice": 220,
     "veg": false,
-    "isAvailable": true,
-    "addons": [
-      { "name": "Extra Gravy", "price": 25.0 }
-    ],
+    "enabled": true,
     "variants": [
-      { "label": "Dry", "price": 220.0 },
-      { "label": "Gravy", "price": 230.0 }
+      {
+        "id": "VAR003",
+        "label": "Dry",
+        "price": 220,
+        "available": true
+      },
+      {
+        "id": "VAR004",
+        "label": "Gravy",
+        "price": 230,
+        "available": true
+      }
+    ],
+    "addons": [
+      {
+        "id": "ADD002",
+        "name": "Extra Gravy",
+        "price": 25,
+        "available": true
+      }
     ]
   },
   {
-    "id": "ITEM003",
+    "_id": "ITEM003",
     "restaurantId": 101,
     "categoryId": "CAT002",
     "name": "Paneer Biryani",
     "description": "Spiced paneer layered with basmati rice",
-    "price": 199.0,
+    "basePrice": 199,
     "veg": true,
-    "isAvailable": true,
+    "enabled": true,
+    "variants": [],
     "addons": [
-      { "name": "Raita", "price": 20.0 }
-    ],
-    "variants": []
+      {
+        "id": "ADD003",
+        "name": "Raita",
+        "price": 20,
+        "available": true
+      }
+    ]
   },
   {
-    "id": "ITEM004",
+    "_id": "ITEM004",
     "restaurantId": 101,
     "categoryId": "CAT003",
     "name": "Fresh Lime Soda",
     "description": "Sweet or salted — your choice",
-    "price": 69.0,
+    "basePrice": 69,
     "veg": true,
-    "isAvailable": true,
-    "addons": [],
-    "variants": []
+    "enabled": true,
+    "variants": [],
+    "addons": []
   }
 ]

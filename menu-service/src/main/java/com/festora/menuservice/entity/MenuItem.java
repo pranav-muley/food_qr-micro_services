@@ -25,10 +25,11 @@ public class MenuItem {
 
     private String name;
     private String description;
-    private Double price;
+
+    private Double basePrice;        // renamed from price
 
     private Boolean veg;
-    private Boolean isAvailable;
+    private Boolean enabled;          // renamed from isAvailable
 
     private List<Variant> variants;
     private List<Addon> addons;

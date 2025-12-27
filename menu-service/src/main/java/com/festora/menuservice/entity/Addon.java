@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Addon {
+    private String id;
     private String name;
     private Double price;
     private Boolean available;
