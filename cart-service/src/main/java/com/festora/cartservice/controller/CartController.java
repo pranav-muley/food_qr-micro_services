@@ -1,41 +1,63 @@
 package com.festora.cartservice.controller;
 
-import com.festora.cartservice.dto.AddItemRequest;
+import com.festora.cartservice.dto.AddToCartRequest;
+import com.festora.cartservice.dto.CheckoutRequest;
+import com.festora.cartservice.dto.UpdateCartItemRequest;
 import com.festora.cartservice.model.Cart;
-import com.festora.cartservice.model.CartItem;
 import com.festora.cartservice.service.CartService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1/cart")
+@RequestMapping("/cart")
+@RequiredArgsConstructor
 public class CartController {
 
     private final CartService cartService;
 
-    public CartController(CartService cartService) {
-        this.cartService = cartService;
-    }
-
     @PostMapping("/items")
-    public Cart addItem(@RequestHeader("X-Session-Id") String sessionId,
-                        @RequestBody AddItemRequest req) {
-        CartItem item = new CartItem(
-                req.getItemId(),
-                req.getName(),
-                req.getPrice(),
-                req.getQty()
-        );
-        return cartService.addItem(sessionId, item);
+    public Cart addItem(@RequestBody AddToCartRequest req) {
+        return cartService.addItem(req);
     }
 
     @GetMapping
-    public Cart getCart(@RequestHeader("X-Session-Id") String sessionId) {
-        return cartService.getCart(sessionId);
+    public Cart viewCart(
+            @RequestParam Long restaurantId,
+            @RequestParam String sessionId
+    ) {
+        return cartService.getCart(restaurantId, sessionId);
     }
 
     @DeleteMapping
-    public void clear(@RequestHeader("X-Session-Id") String sessionId) {
-        cartService.clear(sessionId);
+    public void clearCart(
+            @RequestParam Long restaurantId,
+            @RequestParam String sessionId
+    ) {
+        cartService.clearCart(restaurantId, sessionId);
     }
+
+
+    @PutMapping("/items/{cartItemId}")
+    public Cart updateItemQuantity(
+            @PathVariable String cartItemId,
+            @RequestBody UpdateCartItemRequest req
+    ) {
+        return cartService.updateItemQuantity(cartItemId, req);
+    }
+
+    @DeleteMapping("/items/{cartItemId}")
+    public Cart removeItem(
+            @PathVariable String cartItemId,
+            @RequestParam Long restaurantId,
+            @RequestParam String sessionId
+    ) {
+        return cartService.removeItem(restaurantId, sessionId, cartItemId);
+    }
+
+    @PostMapping("/checkout")
+    public Object checkout(@RequestBody CheckoutRequest request) {
+        return cartService.checkout(request);
+    }
+
 }
 

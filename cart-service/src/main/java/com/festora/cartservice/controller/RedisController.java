@@ -8,15 +8,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RedisController {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Cart> redisTemplate;
 
-    public RedisController(RedisTemplate<String, Object> redisTemplate) {
+    public RedisController(RedisTemplate<String, Cart> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
     @GetMapping("/test/redis")
     public String test() {
-        redisTemplate.opsForValue().set("test:key", new Cart());
+        Cart cart = Cart.builder()
+                .cartId("TEST_CART")
+                .restaurantId(101L)
+                .sessionId("TEST_SESSION")
+                .subtotal(0)
+                .build();
+
+        redisTemplate.opsForValue().set("test:key", cart);
         return "OK";
     }
 }

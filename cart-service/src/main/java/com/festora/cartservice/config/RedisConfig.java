@@ -1,28 +1,32 @@
 package com.festora.cartservice.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.festora.cartservice.model.Cart;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}")
-    private String redisHost;
-    @Value("${spring.data.redis.port}")
-    private int redisPort;
-
     @Bean
-    public LettuceConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(redisHost, redisPort);
-    }
+    public RedisTemplate<String, Cart> cartRedisTemplate(
+            RedisConnectionFactory connectionFactory
+    ) {
+        RedisTemplate<String, Cart> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
 
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory factory) {
-        RedisTemplate<String, Object> t = new RedisTemplate<>();
-        t.setConnectionFactory(factory);
-        return t;
+        template.setKeySerializer(new StringRedisSerializer());
+
+        Jackson2JsonRedisSerializer<Cart> valueSerializer =
+                new Jackson2JsonRedisSerializer<>(Cart.class);
+
+        template.setValueSerializer(valueSerializer);
+        template.setHashValueSerializer(valueSerializer);
+
+        template.afterPropertiesSet();
+        return template;
     }
 }
