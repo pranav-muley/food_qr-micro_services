@@ -13,9 +13,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrderDto {
-    private String orderId;
-    private String userId;
-    private String status;
-    private List<OrderProduct> orderProducts;
+public class OrderItem {
+
+    private String menuItemId;
+    private String variantId;
+    private List<String> addonIds;
+
+    private double unitPrice;
+    private int quantity;
+    private double lineTotal;
 }
+
+

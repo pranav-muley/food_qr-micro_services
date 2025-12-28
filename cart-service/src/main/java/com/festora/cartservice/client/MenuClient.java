@@ -33,7 +33,7 @@ public class MenuClient {
 
         return webClient.post()
                 .uri(menuBaseUrl + "/menu/validate")
-                .header("X-API-KEY", "SECRET123")   // ✅ REQUIRED
+                .header("X-API-KEY", "SECRET123")   // REQUIRED
                 .header("Content-Type", "application/json")
                 .bodyValue(request)
                 .retrieve()

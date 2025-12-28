@@ -11,7 +11,7 @@ import com.festora.cartservice.model.AddonSnapshot;
 import com.festora.cartservice.model.Cart;
 import com.festora.cartservice.model.CartItem;
 import com.festora.cartservice.repository.CartRedisRepository;
-import com.festora.cartservice.service.client.OrderClient;
+import com.festora.cartservice.client.OrderClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;

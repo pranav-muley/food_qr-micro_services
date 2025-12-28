@@ -1,47 +1,76 @@
 package com.festora.orderservice.controller;
 
+import com.festora.orderservice.dto.CreateOrderRequest;
+import com.festora.orderservice.dto.OrderCreateResponse;
 import com.festora.orderservice.model.Order;
-import com.festora.orderservice.model.OrderDto;
 import com.festora.orderservice.service.OrderService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api/orders")
+@RequiredArgsConstructor
 public class OrderController {
-    private final OrderService orderService;
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
 
-    @GetMapping("/get")
-    public ResponseEntity<Order> getOrders(@RequestParam("orderId") String orderId, @RequestParam("userId") String userId) {
-        try{
-            Order order = orderService.getOrderByOrderIdUserId(orderId, userId);
-            return new ResponseEntity<>(order, HttpStatus.OK);
-        } catch (IllegalArgumentException ill) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
+    private final OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createOrder(@RequestBody OrderDto orderDto) {
-        try {
-            return new ResponseEntity<>(orderService.createOrder(orderDto), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<OrderCreateResponse> createOrder(
+            @RequestBody CreateOrderRequest request
+    ) {
+        Order order = orderService.createOrder(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(OrderCreateResponse.builder()
+                        .orderId(order.getOrderId())
+                        .status(order.getStatus())
+                        .totalAmount(order.getTotalAmount())
+                        .build());
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<OrderDto> updateOrder(@RequestBody OrderDto orderDto) {
-        try{
-            return new ResponseEntity<>(orderService.updateOrder(orderDto), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    // ==================================================
+    // 2) Get Order (UI / Admin / Kitchen)
+    // ==================================================
+    @GetMapping("/{orderId}")
+    public ResponseEntity<Order> getOrder(@PathVariable String orderId) {
+        return ResponseEntity.ok(orderService.getOrder(orderId));
+    }
+
+    // ==================================================
+    // 3) Payment Callback (Success)
+    // ==================================================
+    @PostMapping("/{orderId}/payment/success")
+    public ResponseEntity<Void> paymentSuccess(@PathVariable String orderId) {
+        orderService.onPaymentSuccess(orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    // ==================================================
+    // 4) Kitchen Workflow
+    // ==================================================
+    @PostMapping("/{orderId}/prepare")
+    public ResponseEntity<Void> markPreparing(@PathVariable String orderId) {
+        orderService.markPreparing(orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/ready")
+    public ResponseEntity<Void> markReady(@PathVariable String orderId) {
+        orderService.markReady(orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/served")
+    public ResponseEntity<Void> markServed(@PathVariable String orderId) {
+        orderService.markServed(orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/close")
+    public ResponseEntity<Void> closeOrder(@PathVariable String orderId) {
+        orderService.closeOrder(orderId);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,11 +1,8 @@
 package com.festora.orderservice.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.festora.orderservice.enums.OrderStatus;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -14,19 +11,30 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-
-@Document("order")
+@AllArgsConstructor
+@Document(collection = "orders")
 public class Order {
-    private String orderId;
-    private String userId;
-/*    private long tableNumber;*/
 
-    private String status;
-    private List<OrderProduct> orderProducts;
-    private long dateCreated;
-    private long dateModified;
+    @Id
+    private String orderId;   // IMPORTANT: this IS Mongo _id
+
+    private Long restaurantId;
+    private String sessionId;
+    private String tableNumber;
+
+    private List<OrderItem> items;
+
+    private double baseAmount;
+    private double cgstAmount;
+    private double sgstAmount;
+    private double gstAmount;   // cgst + sgst
+    private double discountAmount;
+    private double totalAmount;
+
+    private OrderStatus status;
+
+    private long createdAt;
+    private long updatedAt;
 }

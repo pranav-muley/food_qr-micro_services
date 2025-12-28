@@ -1,4 +1,4 @@
-package com.festora.cartservice.service.client;
+package com.festora.cartservice.client;
 
 import com.festora.cartservice.dto.client.OrderCreateRequest;
 import lombok.RequiredArgsConstructor;
