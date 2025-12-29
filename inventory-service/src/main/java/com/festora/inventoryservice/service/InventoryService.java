@@ -1,98 +1,112 @@
 package com.festora.inventoryservice.service;
 
-import com.festora.inventoryservice.dto.OrderItem;
-import com.festora.inventoryservice.entity.InventoryItem;
-import com.festora.inventoryservice.entity.StockReservation;
+import com.festora.inventoryservice.dto.InventoryReservationResponse;
+import com.festora.inventoryservice.dto.InventoryReserveRequest;
+import com.festora.inventoryservice.dto.ReservedItemRequest;
+import com.festora.inventoryservice.entity.InventoryReservation;
+import com.festora.inventoryservice.entity.InventoryReservationItem;
+import com.festora.inventoryservice.entity.InventoryStock;
 import com.festora.inventoryservice.enums.ReservationStatus;
-import com.festora.inventoryservice.exception.OutOfStockException;
-import com.festora.inventoryservice.repo.InventoryRepository;
-import com.festora.inventoryservice.repo.ReservationRepository;
+import com.festora.inventoryservice.repo.InventoryReservationItemRepository;
+import com.festora.inventoryservice.repo.InventoryReservationRepository;
+import com.festora.inventoryservice.repo.InventoryStockRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class InventoryService {
 
-    private final InventoryRepository inventoryRepository;
-    private final ReservationRepository reservationRepository;
+    private final InventoryStockRepository stockRepo;
+    private final InventoryReservationRepository reservationRepo;
+    private final InventoryReservationItemRepository itemRepo;
 
-    @Transactional
-    public void reserveStock(
-            String orderId,
-            List<OrderItem> items
+    public InventoryReservationResponse tempReserve(
+            InventoryReserveRequest request
     ) {
 
-        for (OrderItem item : items) {
+        String orderId = request.getOrderId();
 
-            // 🔒 Idempotency check
-            boolean exists = reservationRepository
-                    .existsByOrderIdAndMenuItemIdAndVariantId(
-                            orderId,
-                            item.getMenuItemId(),
-                            item.getVariantId()
-                    );
+        // Idempotency
+        InventoryReservation reserved = reservationRepo.findByOrderId(orderId);
+        if (!ObjectUtils.isEmpty(reserved)) {
+            return null;
+        }
 
-            if (exists) continue;
+        long now = System.currentTimeMillis();
+        long expiresAt = now + request.getTtlSeconds() * 1000L;
+        String reservationId = UUID.randomUUID().toString();
 
-            InventoryItem inventory = inventoryRepository
-                    .findByMenuItemIdAndVariantId(
-                            item.getMenuItemId(),
-                            item.getVariantId()
-                    )
-                    .orElseThrow(() -> new RuntimeException("Inventory not found"));
+        // Deduct stock
+        for (ReservedItemRequest item : request.getItems()) {
 
-            if (inventory.getAvailableQuantity() < item.getQuantity()) {
-                throw new OutOfStockException("OUT_OF_STOCK");
+            String stockId = buildStockId(
+                    item.getMenuItemId(),
+                    item.getVariantId()
+            );
+
+            InventoryStock stock = stockRepo.lockById(stockId);
+
+            if (stock.getAvailableQty() < item.getQuantity()) {
+                throw new IllegalStateException("INSUFFICIENT_STOCK");
             }
 
-            inventory.setAvailableQuantity(
-                    inventory.getAvailableQuantity() - item.getQuantity()
+            stock.setAvailableQty(
+                    stock.getAvailableQty() - item.getQuantity()
             );
-            inventory.setReservedQuantity(
-                    inventory.getReservedQuantity() + item.getQuantity()
-            );
+            stock.setUpdatedAt(now);
 
-            inventoryRepository.save(inventory);
-
-            StockReservation reservation = new StockReservation(
-                    null,
-                    orderId,
-                    item.getMenuItemId(),
-                    item.getVariantId(),
-                    item.getQuantity(),
-                    ReservationStatus.RESERVED,
-                    LocalDateTime.now()
-            );
-
-            reservationRepository.save(reservation);
+            stockRepo.save(stock);
         }
+
+        // Create reservation header
+        InventoryReservation reservation = new InventoryReservation();
+        reservation.setReservationId(reservationId);
+        reservation.setOrderId(orderId);
+        reservation.setStatus(ReservationStatus.TEMP);
+        reservation.setCreatedAt(now);
+        reservation.setExpiresAt(expiresAt);
+
+        reservationRepo.save(reservation);
+
+        //  Create reservation items
+        for (ReservedItemRequest item : request.getItems()) {
+            InventoryReservationItem ri = new InventoryReservationItem();
+            ri.setReservationId(reservationId);
+            ri.setMenuItemId(item.getMenuItemId());
+            ri.setVariantId(item.getVariantId());
+            ri.setQuantity(item.getQuantity());
+
+            itemRepo.save(ri);
+        }
+
+        // 5️⃣ API response
+        return new InventoryReservationResponse(
+                orderId,
+                reservationId,
+                ReservationStatus.TEMP,
+                expiresAt
+        );
     }
 
-    @Transactional
-    public void releaseStock(StockReservation res) {
+    public void confirmReservation(String orderId) {
 
-        InventoryItem inventory = inventoryRepository
-                .findByMenuItemIdAndVariantId(
-                        res.getMenuItemId(),
-                        res.getVariantId()
-                )
-                .orElseThrow();
+        InventoryReservation reservation = reservationRepo.findByOrderId(orderId);
 
-        inventory.setAvailableQuantity(
-                inventory.getAvailableQuantity() + res.getQuantity()
-        );
-        inventory.setReservedQuantity(
-                inventory.getReservedQuantity() - res.getQuantity()
-        );
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+            return;
+        }
 
-        inventoryRepository.save(inventory);
+        reservation.setStatus(ReservationStatus.CONFIRMED);
+        reservationRepo.save(reservation);
+    }
 
-        res.setStatus(ReservationStatus.RELEASED);
-        reservationRepository.save(res);
+    private String buildStockId(String menuItemId, String variantId) {
+        return menuItemId + "|" + (variantId == null ? "NA" : variantId);
     }
 }

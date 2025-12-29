@@ -1,7 +1,7 @@
 package com.festora.inventoryservice.enums;
 
 public enum ReservationStatus {
-    RESERVED,
+    TEMP_RESERVED, TEMP,
     CONFIRMED,
     RELEASED
 }

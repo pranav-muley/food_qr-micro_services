@@ -20,12 +20,15 @@ spring:
     name: inventory-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/inventory_db
-    username: inventory_user
-    password: inventory_pass
+    url: jdbc:postgresql://db.jryaafvfzhnksekujawl.supabase.co:5432/postgres
+    username: postgres
+    password: BvH4F3L3tjSWnbFM
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate   # use update only for dev
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
