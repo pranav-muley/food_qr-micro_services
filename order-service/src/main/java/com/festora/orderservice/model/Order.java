@@ -33,8 +33,13 @@ public class Order {
     private double discountAmount;
     private double totalAmount;
 
+    private String inventoryReservationId;
+    private long inventoryExpiresAt;
+
+    // State
     private OrderStatus status;
 
+    // Timestamps
     private long createdAt;
     private long updatedAt;
 }

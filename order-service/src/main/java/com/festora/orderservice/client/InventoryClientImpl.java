@@ -18,8 +18,12 @@ public class InventoryClientImpl implements InventoryClient {
     @Value("${inventory.service.base-url}")
     private String inventoryBaseUrl;
 
-    private static final int RESERVE_TTL_SECONDS = 300; // 5 min
+    // POSTPAID dine-in safe default
+    private static final int RESERVE_TTL_SECONDS = 2 * 60 * 60; // 2 hours
 
+    /* ===============================
+       1️⃣ INITIAL ORDER RESERVE
+       =============================== */
     @Override
     public void tempReserve(Order order) {
 
@@ -35,16 +39,43 @@ public class InventoryClientImpl implements InventoryClient {
                     .toBodilessEntity()
                     .block();
 
-            log.info("TEMP reserve request sent for order {}", order.getOrderId());
+            log.info("Inventory TEMP reserved for order {}", order.getOrderId());
 
         } catch (Exception e) {
-            log.error("Failed to TEMP reserve inventory for order {}", order.getOrderId(), e);
-            // ❗ DO NOT update order here
-            // Inventory will emit inventory.failed if needed
+            log.error("Inventory TEMP reserve failed for order {}", order.getOrderId(), e);
+            throw new IllegalStateException("INVENTORY_OUT_OF_STOCK");
         }
     }
 
+    /* ===============================
+       2️⃣ ADD MORE ITEMS (INCREMENTAL)
+       =============================== */
+    @Override
+    public void tempReserve(String orderId, List<OrderItem> newItems) {
 
+        InventoryReserveRequest request =
+                InventoryReserveRequest.from(orderId, newItems, RESERVE_TTL_SECONDS);
+
+        try {
+            webClientBuilder.build()
+                    .post()
+                    .uri(inventoryBaseUrl + "/inventory/temp-reserve")
+                    .bodyValue(request)
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block();
+
+            log.info("Inventory TEMP reserve extended for order {}", orderId);
+
+        } catch (Exception e) {
+            log.error("Inventory TEMP reserve failed for add-items {}", orderId, e);
+            throw new IllegalStateException("ITEM_OUT_OF_STOCK");
+        }
+    }
+
+    /* ===============================
+       3️⃣ CONFIRM AFTER PAYMENT
+       =============================== */
     @Override
     public void confirm(String orderId) {
 
@@ -56,10 +87,12 @@ public class InventoryClientImpl implements InventoryClient {
                     .toBodilessEntity()
                     .block();
 
-//            log.info("Inventory confirmed for order {}", orderId);
+            log.info("Inventory CONFIRMED for order {}", orderId);
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            // Retryable error — payment already done
+            log.error("Inventory CONFIRM failed for order {}", orderId, e);
+            throw new IllegalStateException("INVENTORY_CONFIRM_FAILED");
         }
     }
 }

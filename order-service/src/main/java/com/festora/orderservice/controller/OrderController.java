@@ -3,11 +3,14 @@ package com.festora.orderservice.controller;
 import com.festora.orderservice.dto.CreateOrderRequest;
 import com.festora.orderservice.dto.OrderCreateResponse;
 import com.festora.orderservice.model.Order;
+import com.festora.orderservice.model.OrderItem;
 import com.festora.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -56,11 +59,11 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{orderId}/ready")
-    public ResponseEntity<Void> markReady(@PathVariable String orderId) {
-        orderService.markReady(orderId);
-        return ResponseEntity.ok().build();
-    }
+//    @PostMapping("/{orderId}/ready")
+//    public ResponseEntity<Void> markReady(@PathVariable String orderId) {
+//        orderService.markReady(orderId);
+//        return ResponseEntity.ok().build();
+//    }
 
     @PostMapping("/{orderId}/served")
     public ResponseEntity<Void> markServed(@PathVariable String orderId) {
@@ -73,4 +76,31 @@ public class OrderController {
         orderService.closeOrder(orderId);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{orderId}/items")
+    public ResponseEntity<Order> addItems(
+            @PathVariable String orderId,
+            @RequestBody List<OrderItem> items
+    ) {
+        return ResponseEntity.ok(
+                orderService.addItems(orderId, items)
+        );
+    }
+
+    @PostMapping("/{orderId}/request-bill")
+    public ResponseEntity<Void> requestBill(@PathVariable String orderId) {
+        orderService.requestBill(orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<Void> cancelOrder(
+            @PathVariable String orderId,
+            @RequestParam(required = false) String reason
+    ) {
+        orderService.cancelOrder(orderId,
+                reason == null ? "MANUAL_CANCEL" : reason);
+        return ResponseEntity.ok().build();
+    }
+
 }

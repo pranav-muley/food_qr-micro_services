@@ -10,6 +10,7 @@ public enum OrderStatus {
     SERVED,
     CLOSED,
     INVENTORY_FAILED,
+    PAYMENT_REQUESTED,  // Bill frozen, waiting for payment
     CANCELLED
 }
 
