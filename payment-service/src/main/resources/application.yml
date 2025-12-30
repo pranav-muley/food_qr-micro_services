@@ -1,11 +1,14 @@
 server:
-  port: 8088
+  port: 8089
 
 spring:
+  application:
+    name: payment-service
+
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: inventory-group
+      group-id: payment-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -16,8 +19,6 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-  application:
-    name: inventory-service
 
   datasource:
     url: jdbc:postgresql://db.jryaafvfzhnksekujawl.supabase.co:5432/postgres
