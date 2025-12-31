@@ -15,6 +15,12 @@ public class CartController {
 
     private final CartService cartService;
 
+    @GetMapping("/health")
+    public String health() {
+        return "CART OK";
+    }
+
+
     @PostMapping("/items")
     public Cart addItem(@RequestBody AddToCartRequest req) {
         return cartService.addItem(req);

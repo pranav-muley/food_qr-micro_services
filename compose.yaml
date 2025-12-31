@@ -1,4 +1,16 @@
 services:
+  menu-service:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - cart-service
+
+  cart-service:
+    build: ./cart-service
+    ports:
+      - "8086:8086"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
