@@ -8,7 +8,7 @@ import java.util.List;
 public interface InventoryClient {
 
     void tempReserve(Order order);
-    void tempReserve(String orderId, List<OrderItem> item);
+    void tempReserve(Order order, List<OrderItem> item);
     void confirm(String orderId);
 }
 

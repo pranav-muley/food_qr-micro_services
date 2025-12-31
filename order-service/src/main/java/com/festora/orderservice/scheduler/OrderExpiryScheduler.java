@@ -27,8 +27,7 @@ public class OrderExpiryScheduler {
                 orderRepo.findByStatusInAndUpdatedAtBefore(
                         List.of(
                                 OrderStatus.PAYMENT_PENDING,
-                                OrderStatus.PREPARING,
-                                OrderStatus.SERVED
+                                OrderStatus.PREPARING
                         ),
                         cutoff
                 );

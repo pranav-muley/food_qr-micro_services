@@ -3,6 +3,7 @@ package com.festora.orderservice.service;
 import com.festora.orderservice.client.InventoryClient;
 import com.festora.orderservice.dto.CreateOrderRequest;
 import com.festora.orderservice.dto.GstResult;
+import com.festora.orderservice.dto.InventoryReserveRequest;
 import com.festora.orderservice.enums.OrderStatus;
 import com.festora.orderservice.gst.GstCalculator;
 import com.festora.orderservice.model.Order;
@@ -11,9 +12,10 @@ import com.festora.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -25,12 +27,10 @@ public class OrderService {
     private final InventoryClient inventoryClient;
     private final GstCalculator gstCalculator;
 
-    /* ===============================
-       1️⃣ CREATE ORDER (INITIAL)
-       =============================== */
-    public Order createOrder(CreateOrderRequest req) {
-
-        Objects.requireNonNull(req, "Request cannot be null");
+    public Order createOrder(CreateOrderRequest req) throws Exception {
+        if (ObjectUtils.isEmpty(req)) {
+            throw new Exception("Order request cant be empty");
+        }
 
         Order order = buildOrder(req);
         orderRepository.save(order);
@@ -38,14 +38,13 @@ public class OrderService {
         // 🔒 Initial inventory failure CAN cancel order
         try {
             inventoryClient.tempReserve(order);
-            order.setStatus(OrderStatus.PAYMENT_PENDING);
+            order.setStatus(OrderStatus.PENDING);
         } catch (Exception e) {
-            order.setStatus(OrderStatus.CANCELLED);
+            order.setStatus(OrderStatus.REJECTED);
             order.setUpdatedAt(now());
             orderRepository.save(order);
             throw new IllegalStateException("OUT_OF_STOCK");
         }
-
         order.setUpdatedAt(now());
         return orderRepository.save(order);
     }
@@ -63,7 +62,7 @@ public class OrderService {
 
         // 🔒 Inventory failure here must NOT cancel order
         try {
-            inventoryClient.tempReserve(orderId, newItems);
+            inventoryClient.tempReserve(order, newItems);
         } catch (Exception e) {
             throw new IllegalStateException("ITEM_OUT_OF_STOCK");
         }
@@ -97,14 +96,14 @@ public class OrderService {
     }
 
     public void markServed(String orderId) {
-        transition(orderId, OrderStatus.PREPARING, OrderStatus.SERVED);
+        transition(orderId, OrderStatus.PREPARING, OrderStatus.PAYMENT_PENDING);
     }
 
     /* ===============================
        4️⃣ BILL REQUEST (POSTPAID)
        =============================== */
     public void requestBill(String orderId) {
-        transition(orderId, OrderStatus.SERVED, OrderStatus.PAYMENT_REQUESTED);
+        transition(orderId, OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED);
     }
 
     /* ===============================
@@ -153,6 +152,7 @@ public class OrderService {
         }
 
         order.setStatus(OrderStatus.CANCELLED);
+        order.setReason(reason);
         order.setUpdatedAt(now());
         orderRepository.save(order);
     }
@@ -244,5 +244,43 @@ public class OrderService {
             return null;
         }
         return orderRepository.findById(orderId).orElse(null);
+    }
+
+    public void markInventoryReserved(InventoryReserveRequest request) {
+        try {
+            // add item found in order
+            String orderId = request.getOrderId();
+            Order order = getOrder(orderId);
+//           List<Items> items=  order.getItems().addAll(request.getItems());
+            order.setItems(order.getItems());
+        } catch (Exception e) {
+            log.error("Inventory TEMP reserve failed for add-items {}", request, e);
+            throw new IllegalStateException("ITEM_OUT_OF_STOCK");
+        }
+
+    }
+
+    public List<Order> getAllPendingOrders() {
+        return orderRepository.findOrdersByStatus(OrderStatus.PENDING);
+    }
+
+    public Order markOrderConfirm(String orderId) throws Exception {
+        if (StringUtils.isEmpty(orderId)) {
+            throw new Exception("Invalid order id");
+        }
+
+        Order order = orderRepository.findById(orderId).orElse(null);
+
+        if (order == null) {
+            throw new Exception("Order not found");
+        }
+
+        // confirm inventory ->
+        inventoryClient.confirm(orderId);
+
+        // update status
+        order.setStatus(OrderStatus.PREPARING);
+        order.setUpdatedAt(now());
+        return orderRepository.save(order);
     }
 }

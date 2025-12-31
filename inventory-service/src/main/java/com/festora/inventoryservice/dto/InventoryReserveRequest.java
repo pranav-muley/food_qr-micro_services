@@ -8,6 +8,7 @@ import java.util.List;
 public class InventoryReserveRequest {
 
     private String orderId;
+    private Long restaurantId;
     private int ttlSeconds;
     private List<ReservedItemRequest> items;
 }

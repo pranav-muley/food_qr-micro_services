@@ -13,24 +13,26 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
     private final OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<OrderCreateResponse> createOrder(
-            @RequestBody CreateOrderRequest request
-    ) {
-        Order order = orderService.createOrder(request);
+    public ResponseEntity<OrderCreateResponse> createOrder(@RequestBody CreateOrderRequest request) {
+        try {
+            Order order = orderService.createOrder(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(OrderCreateResponse.builder()
-                        .orderId(order.getOrderId())
-                        .status(order.getStatus())
-                        .totalAmount(order.getTotalAmount())
-                        .build());
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(OrderCreateResponse.builder()
+                            .orderId(order.getOrderId())
+                            .status(order.getStatus())
+                            .totalAmount(order.getTotalAmount())
+                            .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // ==================================================

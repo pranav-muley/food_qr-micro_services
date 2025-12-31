@@ -26,9 +26,7 @@ public class InventoryService {
     private final InventoryReservationRepository reservationRepo;
     private final InventoryReservationItemRepository itemRepo;
 
-    public InventoryReservationResponse tempReserve(
-            InventoryReserveRequest request
-    ) {
+    public InventoryReservationResponse tempReserve(InventoryReserveRequest request) {
 
         String orderId = request.getOrderId();
 
@@ -45,10 +43,7 @@ public class InventoryService {
         // Deduct stock
         for (ReservedItemRequest item : request.getItems()) {
 
-            String stockId = buildStockId(
-                    item.getMenuItemId(),
-                    item.getVariantId()
-            );
+            String stockId = buildStockId(request.getRestaurantId(), item.getMenuItemId(), item.getVariantId());
 
             InventoryStock stock = stockRepo.lockById(stockId);
 
@@ -56,11 +51,8 @@ public class InventoryService {
                 throw new IllegalStateException("INSUFFICIENT_STOCK");
             }
 
-            stock.setAvailableQty(
-                    stock.getAvailableQty() - item.getQuantity()
-            );
+            stock.setAvailableQty(stock.getAvailableQty() - item.getQuantity());
             stock.setUpdatedAt(now);
-
             stockRepo.save(stock);
         }
 
@@ -85,7 +77,6 @@ public class InventoryService {
             itemRepo.save(ri);
         }
 
-        // 5️⃣ API response
         return new InventoryReservationResponse(
                 orderId,
                 reservationId,
@@ -106,7 +97,7 @@ public class InventoryService {
         reservationRepo.save(reservation);
     }
 
-    private String buildStockId(String menuItemId, String variantId) {
-        return menuItemId + "|" + (variantId == null ? "NA" : variantId);
+    private String buildStockId(Long restaurantId , String menuItemId, String variantId) {
+        return restaurantId + "_" + menuItemId + "_" + (variantId == null ? "NA" : variantId);
     }
 }

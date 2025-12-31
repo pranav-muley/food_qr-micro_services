@@ -19,7 +19,7 @@ public class OrderClient {
 
         return webClientBuilder.build()
                 .post()
-                .uri(orderBaseUrl + "/orders")
+                .uri(orderBaseUrl + "/orders/create")
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(Object.class) // order response DTO later

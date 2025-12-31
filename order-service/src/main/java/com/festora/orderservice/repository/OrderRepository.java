@@ -14,4 +14,5 @@ public interface OrderRepository extends MongoRepository<Order, String> {
             long cutoffTime
     );
 
+    List<Order> findOrdersByStatus(OrderStatus status);
 }

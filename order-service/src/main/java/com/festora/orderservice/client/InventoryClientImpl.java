@@ -2,11 +2,14 @@ package com.festora.orderservice.client;
 
 import com.festora.orderservice.dto.InventoryReserveRequest;
 import com.festora.orderservice.model.Order;
+import com.festora.orderservice.model.OrderItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -51,10 +54,10 @@ public class InventoryClientImpl implements InventoryClient {
        2️⃣ ADD MORE ITEMS (INCREMENTAL)
        =============================== */
     @Override
-    public void tempReserve(String orderId, List<OrderItem> newItems) {
+    public void tempReserve(Order order, List<OrderItem> newItems) {
 
         InventoryReserveRequest request =
-                InventoryReserveRequest.from(orderId, newItems, RESERVE_TTL_SECONDS);
+                InventoryReserveRequest.from(order, RESERVE_TTL_SECONDS);
 
         try {
             webClientBuilder.build()
@@ -65,10 +68,10 @@ public class InventoryClientImpl implements InventoryClient {
                     .toBodilessEntity()
                     .block();
 
-            log.info("Inventory TEMP reserve extended for order {}", orderId);
+            log.info("Inventory TEMP reserve extended for order {}", order.getOrderId());
 
         } catch (Exception e) {
-            log.error("Inventory TEMP reserve failed for add-items {}", orderId, e);
+            log.error("Inventory TEMP reserve failed for add-items {}", order.getOrderId(), e);
             throw new IllegalStateException("ITEM_OUT_OF_STOCK");
         }
     }

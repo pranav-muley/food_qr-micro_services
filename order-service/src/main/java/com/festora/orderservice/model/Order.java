@@ -36,6 +36,8 @@ public class Order {
     private String inventoryReservationId;
     private long inventoryExpiresAt;
 
+    private String reason;
+
     // State
     private OrderStatus status;
 

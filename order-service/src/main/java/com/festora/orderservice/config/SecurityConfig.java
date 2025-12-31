@@ -13,9 +13,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // disable CSRF for testing
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/*"
-                        ).permitAll()
+                        .requestMatchers("/orders/**", "/owner/**", "/tax-config/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

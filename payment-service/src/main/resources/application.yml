@@ -21,15 +21,26 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://db.jryaafvfzhnksekujawl.supabase.co:5432/postgres
-    username: postgres
-    password: BvH4F3L3tjSWnbFM
+    url: jdbc:postgresql://ep-young-heart-a11n4mzq-pooler.ap-southeast-1.aws.neon.tech:5432/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_Jjh2Bz3mQGZS
     driver-class-name: org.postgresql.Driver
+
+    hikari:
+      data-source-properties:
+        preferQueryMode: simple
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
   jpa:
     hibernate:
-      ddl-auto: validate   # use update only for dev
+      ddl-auto: update
     show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: never

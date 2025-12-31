@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/inventory/reservations")
+@RequestMapping("/inventory")
 @RequiredArgsConstructor
 public class InventoryController {
 
@@ -16,8 +16,8 @@ public class InventoryController {
 
     // ==============================
     // TEMP RESERVE
-    // ==============================
-    @PostMapping("/temp")
+    // ==============================/inventory/temp-reserve
+    @PostMapping("/temp-reserve")
     public ResponseEntity<InventoryReservationResponse> tempReserve(
             @RequestBody InventoryReserveRequest request
     ) {
@@ -28,7 +28,7 @@ public class InventoryController {
     // ==============================
     // CONFIRM AFTER PAYMENT
     // ==============================
-    @PostMapping("/{orderId}/confirm")
+    @PostMapping("/confirm/{orderId}")
     public ResponseEntity<Void> confirm(@PathVariable String orderId) {
         inventoryService.confirmReservation(orderId);
         return ResponseEntity.ok().build();

@@ -59,8 +59,8 @@ public class CartService {
                     .build();
         }
 
-        MenuValidationResult menuResult =
-                menuClient.validateAndFetch(req.getRestaurantId(), req.getMenuItemId(), req.getVariantId(), req.getAddonIds());
+        MenuValidationResult menuResult = menuClient.validateAndFetch(req.getRestaurantId(), req.getMenuItemId(),
+                req.getVariantId(), req.getAddonIds());
 
         double unitPrice =
                 menuResult.getVariantPrice()
@@ -275,7 +275,7 @@ public class CartService {
                         .build();
 
         // 🚀 Call Order Service
-//        Object orderResponse = orderClient.createOrder(orderRequest);
+        Object orderResponse = orderClient.createOrder(orderRequest);
 
         // 🧹 Clear cart only on success
         cartRepo.delete(key);

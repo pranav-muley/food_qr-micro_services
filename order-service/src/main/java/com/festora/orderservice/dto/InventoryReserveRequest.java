@@ -11,12 +11,14 @@ import java.util.List;
 public class InventoryReserveRequest {
 
     private String orderId;
+    private Long restaurantId;
     private int ttlSeconds;
     private List<InventoryItem> items;
 
     public static InventoryReserveRequest from(Order order, int ttlSeconds) {
         return InventoryReserveRequest.builder()
                 .orderId(order.getOrderId())
+                .restaurantId(order.getRestaurantId())
                 .ttlSeconds(ttlSeconds)
                 .items(
                         order.getItems().stream()
