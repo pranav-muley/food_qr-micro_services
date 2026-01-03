@@ -32,12 +32,12 @@ spring:
 
   data:
     redis:
-      repositories:
-        enabled: false
-        host: ""
-        port: 0
-
-
+#      host: ${REDIS_HOST:red-d5cjfjmuk2gs73857fc0}
+#      port: ${REDIS_PORT:6379}
+#      username: ${REDIS_USERNAME:red-d5cjfjmuk2gs73857fc0}
+#      password: ${REDIS_PASSWORD:9MFMgCCAw4Yv80jsewERZafbBY8poTe9}
+      url: ${REDIS_URL}
+    ssl: false
 
 app:
   qr:

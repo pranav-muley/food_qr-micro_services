@@ -2,11 +2,9 @@ package com.festora.authservice.customer.validator;
 
 import com.festora.authservice.customer.dto.SessionData;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-@Profile("dev")
 @Component
 @RequiredArgsConstructor
 public class SessionStore {
@@ -24,6 +22,7 @@ public class SessionStore {
         String restaurantId = (String) redis.opsForHash().get(key, "restaurantId");
         String table = (String) redis.opsForHash().get(key, "tableNumber");
 
+        assert restaurantId != null;
         return new SessionData(
                 sessionId,
                 Long.valueOf(restaurantId),
