@@ -9,7 +9,7 @@ spring:
         - id: auth-public
           uri: ${AUTH_SERVICE_URL}
           predicates:
-            - Path=/auth/**,/session/**,/health
+            - Path=/auth/**,/session/**,/actuator/health
 
         - id: admin-protected
           uri: ${AUTH_SERVICE_URL}
