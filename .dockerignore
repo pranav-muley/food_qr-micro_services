@@ -1,0 +1,4 @@
+# ignore everything except jar
+*
+!target/
+!target/*.jar

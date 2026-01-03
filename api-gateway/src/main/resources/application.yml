@@ -5,7 +5,36 @@ spring:
   cloud:
     gateway:
       routes:
+
+        # ---------- AUTH SERVICE ----------
+        - id: auth-public
+          uri: http://auth-service:8083
+          predicates:
+            - Path=/auth/**,/session/**,/health
+
+        # ---------- ADMIN / OWNER (JWT REQUIRED) ----------
+        - id: admin-protected
+          uri: http://auth-service:8083
+          predicates:
+            - Path=/admin/**
+          filters:
+            - JwtAuth
+
+        # ---------- MENU ----------
+        - id: menu-service
+          uri: http://menu-service:8085
+          predicates:
+            - Path=/menu/**
+
+        # ---------- CART ----------
         - id: cart-service
           uri: http://cart-service:8086
           predicates:
             - Path=/cart/**
+
+        # ---------- ORDER ----------
+        - id: order-service
+          uri: http://order-service:8087
+          predicates:
+            - Path=/order/**
+

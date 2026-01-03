@@ -1,28 +1,55 @@
+version: "3.9"
+
 services:
-  menu-service:
+
+  api-gateway:
     build: ./api-gateway
     ports:
       - "8080:8080"
     depends_on:
+      - auth-service
+      - menu-service
       - cart-service
+      - order-service
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_REDIS_HOST: redis
+    depends_on:
+      - redis
+
+  menu-service:
+    build: ./menu-service
+    ports:
+      - "8085:8085"
 
   cart-service:
     build: ./cart-service
     ports:
       - "8086:8086"
 
+  order-service:
+    build: ./order-service
+    ports:
+      - "8087:8087"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
-    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
 
   kafka:
     image: confluentinc/cp-kafka:7.3.0
-    container_name: kafka
     depends_on:
       - zookeeper
     ports:
@@ -30,5 +57,6 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
