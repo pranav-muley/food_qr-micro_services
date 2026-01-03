@@ -1,41 +1,68 @@
 package com.festora.authservice.service;
 
+import com.festora.authservice.config.JwtProperties;
+import com.festora.authservice.config.LoginRateLimiter;
+import com.festora.authservice.dto.AuthResponse;
 import com.festora.authservice.model.User;
 import com.festora.authservice.repository.UserRepository;
-import org.apache.commons.lang3.ObjectUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
+
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder encoder;
+    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
+    private final LoginRateLimiter rateLimiter;
+    private final JwtProperties jwtProperties;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+    public AuthResponse login(String email, String password) {
+
+        rateLimiter.validateLoginAllowed(email);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    rateLimiter.onLoginFailure(email);
+                    return new RuntimeException("Invalid credentials");
+                });
+
+        if (!encoder.matches(password, user.getPasswordHash())) {
+            rateLimiter.onLoginFailure(email);
+            throw new RuntimeException("Invalid credentials");
+        }
+
+        rateLimiter.onLoginSuccess(email);
+
+        String access = jwtService.generateAccessToken(user);
+        String refresh = refreshTokenService.create(user.getId());
+        return AuthResponse.builder()
+                .accessToken(access)
+                .refreshToken(refresh)
+                .expiresIn(jwtProperties.getAccessTokenTtlMinutes() * 60)
+                .build();
     }
 
-    public String getLoginDetails(User user) {
-        Optional<User> userOptional = userRepository.getUserByEmail(user.getEmail());
-        if (userOptional.isEmpty()) {
-            return "Please register your account first";
-        }
-        User foundUser = userOptional.get();
-        if (!passwordEncoder.matches(user.getPassword(), foundUser.getPassword())) {
-            return "Password does not match, check password";
-        }
-        return "logged in successfully";
+    public AuthResponse refresh(String refreshToken) {
+        UUID userId = refreshTokenService.validateAndConsume(refreshToken);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String newAccess = jwtService.generateAccessToken(user);
+        String newRefresh = refreshTokenService.create(userId);
+
+        return AuthResponse.builder()
+                .accessToken(newAccess)
+                .refreshToken(newRefresh)
+                .build();
     }
 
-    public String registerUser(User user) {
-        if (ObjectUtils.isEmpty(user)) {
-            return "Please enter your account details";
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-        return "User registered successfully";
+    public void logout(String refreshToken) {
+        refreshTokenService.validateAndConsume(refreshToken);
     }
 }

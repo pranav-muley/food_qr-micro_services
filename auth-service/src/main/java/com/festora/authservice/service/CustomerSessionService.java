@@ -1,24 +1,14 @@
 package com.festora.authservice.service;
 
-import com.festora.authservice.dto.OpenSessionRequest;
-import com.festora.authservice.dto.SessionResult;
 import com.festora.authservice.dto.SessionStartResponse;
 import com.festora.authservice.model.QrTableMapping;
 import com.festora.authservice.repository.QrTableMappingRepository;
-import com.festora.authservice.repository.RedisSessionRepository;
-import com.festora.authservice.utils.HsJwtUtil;
-import com.festora.authservice.utils.QrValidator;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
+import com.festora.authservice.utils.SessionJwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -29,7 +19,7 @@ public class CustomerSessionService {
 
     private final QrTableMappingRepository qrRepo;
     private final StringRedisTemplate redis;
-    private final SessionJwt sessionJwtUtil;
+    private final SessionJwtUtil sessionJwtUtil;
 
     public SessionStartResponse startSession(String qrId) {
 

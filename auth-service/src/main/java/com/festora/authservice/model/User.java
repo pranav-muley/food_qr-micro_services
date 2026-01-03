@@ -1,31 +1,38 @@
 package com.festora.authservice.model;
 
-import com.festora.authservice.enums.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.festora.authservice.enums.UserRole;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Builder
-@AllArgsConstructor
+import java.util.UUID;
+
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
 @NoArgsConstructor
-@Data
-
-@Document(collection = "user")
+@AllArgsConstructor
+@Builder
 public class User {
-    @Id
-    private String userId;
 
-    private Role role;
-    private String mobileNum;
-    private String userName;
-    private String password;
-    @Indexed(unique = true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(nullable = false, updatable = false)
+    private UUID id;
+
+    @Column(nullable = false, unique = true, length = 150)
     private String email;
-    private boolean enabled;
-    private long dateCreated;
-    private long lastModified;
+
+    @Column(nullable = false)
+    private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role;
+
+    @Column(nullable = false)
+    private boolean active = true;
+
+    @Column(name = "restaurant_id")
+    private Long restaurantId;
 }
