@@ -17,7 +17,18 @@ services:
     ports:
       - "8083:8083"
     environment:
-      SPRING_REDIS_HOST: redis
+      # 🔴 Redis (FIXED KEY NAME)
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+
+      # 🔴 Database (used by application.yml)
+      DB_PASSWORD: "npg_Jjh2Bz3mQGZS"
+
+      # 🔴 REQUIRED (your crash was due to this missing)
+      APP_SESSION_SECRET: "dev-session-secret-32-bytes-long"
+
+      # Optional (good practice)
+      SPRING_PROFILES_ACTIVE: docker
     depends_on:
       - redis
 

@@ -38,3 +38,18 @@ spring:
           predicates:
             - Path=/order/**
 
+jwt:
+  issuer: festora-auth
+  audience: festora-internal
+  access-token-ttl-minutes: 15
+
+  public-key: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv7XcyPyxL/Lyj+5m2nW8
+    9FUtT/4NMyAos+Qr360UQGlXF+bR0gXErDo/6CNCnMZyfqbeE4Z2dfoyekRBwBS3
+    mHsQGSgXphJnJlVewj6nniWxwIsaSgFxizryLGW7QlRno5F3slgDy+/3VJYruCDR
+    7aZgPMVTcG6drhXOdD+zarHns3+9X3CzWD5eu4b9pQOv/J/VqyRjJ2JOSy9jqtJk
+    Q2hF/cs2zGjCIJwclEL8q9CiBQyAgxuTk8wb0SHcbPgcV7NRhY6q4G5wpwGxZgqR
+    yhUtS/SxoeFLkuLUf0gVryhklIJM3yEP4UzTj3hyI+dwJpJm3150eyMI1zFyokJ+
+    swIDAQAB
+    -----END PUBLIC KEY-----

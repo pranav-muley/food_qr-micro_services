@@ -1,6 +1,6 @@
-package com.festora.authservice.filter;
+package com.festora.apigateway.filter;
 
-import com.festora.authservice.security.JwtValidator;
+import com.festora.apigateway.security.JwtValidator;
 import io.jsonwebtoken.Claims;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -11,12 +11,13 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
-public class JwtAuthFilterFactory
+public class JwtAuthGatewayFilterFactory
         extends AbstractGatewayFilterFactory<Object> {
 
     private final JwtValidator jwtValidator;
 
-    public JwtAuthFilterFactory(JwtValidator jwtValidator) {
+
+    public JwtAuthGatewayFilterFactory(JwtValidator jwtValidator) {
         super(Object.class);
         this.jwtValidator = jwtValidator;
     }
