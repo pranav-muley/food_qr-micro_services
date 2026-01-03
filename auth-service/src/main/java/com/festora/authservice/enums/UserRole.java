@@ -1,5 +1,5 @@
 package com.festora.authservice.enums;
 
-public enum Role {
+public enum UserRole {
     ADMIN, OWNER, CUSTOMER;
 }
