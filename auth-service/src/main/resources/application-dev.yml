@@ -1,0 +1,107 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    url: jdbc:postgresql://ep-young-heart-a11n4mzq-pooler.ap-southeast-1.aws.neon.tech:5432/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_Jjh2Bz3mQGZS
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      data-source-properties:
+        preferQueryMode: simple
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # =========================
+  # JPA / HIBERNATE
+  # =========================
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: never
+
+  application:
+    name: auth-service
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+
+app:
+  qr:
+    secret: ${APP_QR_SECRET:"TnsLD53NKeFsHhZ73ojREN9XLT8dIuuvmeSh/f3FU2KF7q4m11nf/PJivEuplO9U4tZDUW0JPPByW2VHOU2HMQ=="}
+    token_ttl_seconds: 600   # QR token TTL (seconds) e.g. 10 minutes
+  session:
+    secret: ${APP_SESSION_SECRET:dev-session-secret-32-bytes-long}
+    ttl-seconds: 21600       # session TTL for Redis
+    token-ttl-seconds: 1800  # session JWT lifetime (seconds)
+
+#  session:
+#    ttl-seconds: 21600         # 6 hours
+#    token-ttl-seconds: 1800    # session JWT lifetime (30 minutes)
+#  keys:
+#    # file paths (can be absolute or classpath:)
+#    session-private-key-file: ${APP_SESSION_PRIVATE_KEY:/run/secrets/auth_session_private.pem}
+#    session-public-key-file:  ${APP_SESSION_PUBLIC_KEY:/run/secrets/auth_session_public.pem}
+#    qr-public-key-file:       ${APP_QR_PUBLIC_KEY:/run/secrets/qr_public.pem}
+#    # Key IDs (kid) used in JWT headers (optional)
+#    session-kid: "session-key-1"
+
+
+jwt:
+  issuer: festora-auth
+  audience: festora-internal
+  access-token-ttl-minutes: 15
+
+  public-key: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv7XcyPyxL/Lyj+5m2nW8
+    9FUtT/4NMyAos+Qr360UQGlXF+bR0gXErDo/6CNCnMZyfqbeE4Z2dfoyekRBwBS3
+    mHsQGSgXphJnJlVewj6nniWxwIsaSgFxizryLGW7QlRno5F3slgDy+/3VJYruCDR
+    7aZgPMVTcG6drhXOdD+zarHns3+9X3CzWD5eu4b9pQOv/J/VqyRjJ2JOSy9jqtJk
+    Q2hF/cs2zGjCIJwclEL8q9CiBQyAgxuTk8wb0SHcbPgcV7NRhY6q4G5wpwGxZgqR
+    yhUtS/SxoeFLkuLUf0gVryhklIJM3yEP4UzTj3hyI+dwJpJm3150eyMI1zFyokJ+
+    swIDAQAB
+    -----END PUBLIC KEY-----
+
+  private-key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC/tdzI/LEv8vKP
+    7mbadbz0VS1P/g0zICiz5CvfrRRAaVcX5tHSBcSsOj/oI0KcxnJ+pt4ThnZ1+jJ6
+    REHAFLeYexAZKBemEmcmVV7CPqeeJbHAixpKAXGLOvIsZbtCVGejkXeyWAPL7/dU
+    liu4INHtpmA8xVNwbp2uFc50P7Nqseezf71fcLNYPl67hv2lA6/8n9WrJGMnYk5L
+    L2Oq0mRDaEX9yzbMaMIgnByUQvyr0KIFDICDG5OTzBvRIdxs+BxXs1GFjqrgbnCn
+    AbFmCpHKFS1L9LGh4UuS4tR/SBWvKGSUgkzfIQ/hTNOPeHIj53AmkmbfXnR7IwjX
+    MXKiQn6zAgMBAAECggEAPmk+1OHK71C43dmfe1xcJPD73PBYrL258oKEM//dOXDx
+    zRK0WRrOocEe3/xmqbJDQO8jGhkqxJKszzgcbaNw97+MiJwQQtz33rdpL3SFTgt4
+    eDXw24nnxItunryJv3jJ+qqXXKShq8lV7CAtYHay0Rradr5IwTAJvkxUF21LhB6R
+    NuV0kkUuzzz27jY6dJlP5Ev+gDF5nvIxYQMEieK6+zi7NU8nf514otU7l2QO/atx
+    H5/ohyeGf1V+By1zmZluuj5dfhWLeYk6g0zeEm4/66EuEJYEJwDID4Gxaj3T0laY
+    SxuUnaC+BGRuFGZXK6wwbOd1AYvMjUrTnO/liwmDYQKBgQDtkIPt4L4Uc/OyzDZj
+    fUxw2QyvfqsPtnY5UFRqeJwOlUrR15pWI7hBR2y3bcyxKUzaRVXBpHYyYoyoYK7P
+    3/ifSRr+MytbjcCNR3n8vETM72T5qvGP0TtkQSuyYPnLTNyf8s77lag6qMODQO8a
+    TAzbtf1UjD7XH+rSEbxgrYuxoQKBgQDOlmdkWV3RfdfB3EhqwAHTPp8VltNOmb0A
+    Nqun1u2kREiDHf9WP/DCgIcYWb46pI5dnOSb7bKmA1i9chl4AuEwCmyhC2cWuUdE
+    nGa/IOeSQcAoYHzhgFdMftb5FVV1hgqVSDJyq83ApbbD8nPrIMi7ALN6QhNYQRZz
+    VP4bxAW30wKBgQDUMpDVazj99fCJFcXDKkmcRxQAsglEOLvzR+CPVfo3QH0bYRUX
+    ukI79PuUALykxnpCQUpvdGKrcMGpKOsc/TcLuHYm9zfUSJLk3yKEcPqXf4JXTK0G
+    xGLjkx7f76VQRfCP4oely7D/7HzvAZJRj/qwSiflXHxJFdZfG76DMKEl4QKBgQC6
+    a2ijWi1Z9Kg0zNYgVmGPQWwG7FKEFCFERxFBZKaPW/rfLruSFiLpMVg3Ngx+GK5L
+    dV+qAaX7PvveAE9RR6/zTQTXklWVYN4Z4NSq1kOBbIm9JcyrJMgiRDczD/hNFAcK
+    zNqRNc12cVNqoKfP3oakkS5kPan9MsbSjji7z3ildwKBgFv1fnJUz6C6ftzaygrN
+    OHPTFZ6KnbWZUTvnQKJKGpdWZsbbsP8TIpu6Y8EeLZPhzR5i1PuLRx3i2ZyvvQ+Q
+    avlsAEW0iAa9oxoC5CuThwz89tspWPqeMJwGmxVmWGZ71Q3rUtDOOOMXeWBLWRJ2
+    3kKB+axGNif3btVLQFU5ThQR
+    -----END PRIVATE KEY-----

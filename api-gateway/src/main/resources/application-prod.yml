@@ -1,0 +1,40 @@
+
+server:
+  port: ${PORT:8080}
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth-public
+          uri: ${AUTH_SERVICE_URL}
+          predicates:
+            - Path=/auth/**,/session/**,/health
+
+        - id: admin-protected
+          uri: ${AUTH_SERVICE_URL}
+          predicates:
+            - Path=/admin/**
+          filters:
+            - JwtAuth
+
+        - id: menu
+          uri: ${MENU_SERVICE_URL}
+          predicates:
+            - Path=/menu/**
+
+        - id: cart
+          uri: ${CART_SERVICE_URL}
+          predicates:
+            - Path=/cart/**
+
+        - id: order
+          uri: ${ORDER_SERVICE_URL}
+          predicates:
+            - Path=/order/**
+
+jwt:
+  issuer: festora-auth
+  audience: festora-internal
+  access-token-ttl-minutes: 15
+  public-key: ${JWT_PUBLIC_KEY}
