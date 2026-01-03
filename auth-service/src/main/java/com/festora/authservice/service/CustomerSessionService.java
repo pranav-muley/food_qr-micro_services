@@ -18,7 +18,7 @@ public class CustomerSessionService {
     private static final long SESSION_TTL_SECONDS = 1800;
 
     private final QrTableMappingRepository qrRepo;
-    private final StringRedisTemplate redis;
+//    private final StringRedisTemplate redis;
     private final SessionJwtUtil sessionJwtUtil;
 
     public SessionStartResponse startSession(String qrId) {
@@ -29,12 +29,12 @@ public class CustomerSessionService {
 
         String sessionId = UUID.randomUUID().toString();
 
-        String redisKey = "session:" + sessionId;
-        redis.opsForHash().put(redisKey, "restaurantId", qr.getRestaurantId().toString());
-        redis.opsForHash().put(redisKey, "tableNumber", qr.getTableNumber());
-        redis.opsForHash().put(redisKey, "qrId", qrId);
-
-        redis.expire(redisKey, Duration.ofSeconds(SESSION_TTL_SECONDS));
+//        String redisKey = "session:" + sessionId;
+//        redis.opsForHash().put(redisKey, "restaurantId", qr.getRestaurantId().toString());
+//        redis.opsForHash().put(redisKey, "tableNumber", qr.getTableNumber());
+//        redis.opsForHash().put(redisKey, "qrId", qrId);
+//
+//        redis.expire(redisKey, Duration.ofSeconds(SESSION_TTL_SECONDS));
 
         String token = sessionJwtUtil.createSessionToken(
                 sessionId,

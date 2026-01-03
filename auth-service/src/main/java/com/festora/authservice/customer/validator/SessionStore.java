@@ -2,9 +2,11 @@ package com.festora.authservice.customer.validator;
 
 import com.festora.authservice.customer.dto.SessionData;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+@Profile("dev")
 @Component
 @RequiredArgsConstructor
 public class SessionStore {
