@@ -39,7 +39,8 @@ spring:
       #      port: ${REDIS_PORT:6379}
       #      username: ${REDIS_USERNAME:red-d5cjfjmuk2gs73857fc0}
       #      password: ${REDIS_PASSWORD:9MFMgCCAw4Yv80jsewERZafbBY8poTe9}
-      url: ${REDIS_URL}
+      url: ${REDIS_URL:rediss://red-d5cjfjmuk2gs73857fc0:9MFMgCCAw4Yv80jsewERZafbBY8poTe9@singapore-keyvalue.render.com:6379}
+      timeout: 5000
     ssl: false
 
 
@@ -48,7 +49,7 @@ app:
     secret: ${APP_QR_SECRET:"TnsLD53NKeFsHhZ73ojREN9XLT8dIuuvmeSh/f3FU2KF7q4m11nf/PJivEuplO9U4tZDUW0JPPByW2VHOU2HMQ=="}
     token_ttl_seconds: 600   # QR token TTL (seconds) e.g. 10 minutes
   session:
-    secret: ${APP_SESSION_SECRET:dev-session-secret-32-bytes-long}
+    secret: ${APP_SESSION_SECRET:mysupersecuresecretkey1234567890!!!}
     ttl-seconds: 21600       # session TTL for Redis
     token-ttl-seconds: 1800  # session JWT lifetime (seconds)
 
