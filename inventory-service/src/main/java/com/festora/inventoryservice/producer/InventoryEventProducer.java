@@ -1,7 +1,6 @@
 package com.festora.inventoryservice.producer;
 
-import com.festora.inventoryservice.dto.InventoryFailedEvent;
-import com.festora.inventoryservice.dto.InventoryReservationResponse;
+import com.festora.inventoryservice.dto.event.InventoryReservationEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -12,17 +11,17 @@ public class InventoryEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishReserved(InventoryReservationResponse response) {
+    public void publishReserved(InventoryReservationEvent response) {
         kafkaTemplate.send(
-                "inventory.reserved",
+                "inventory.reservation-events",
                 response.getOrderId(),
                 response
         );
     }
 
-    public void publishFailed(String orderId, InventoryFailedEvent failedEvent) {
+    public void publishFailed(String orderId, InventoryReservationEvent failedEvent) {
         kafkaTemplate.send(
-                "inventory.failed",
+                "inventory.reservation-events",
                 orderId,
                 failedEvent
         );

@@ -52,15 +52,6 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    // ==================================================
-    // 4) Kitchen Workflow
-    // ==================================================
-    @PostMapping("/{orderId}/prepare")
-    public ResponseEntity<Void> markPreparing(@PathVariable String orderId) {
-        orderService.markPreparing(orderId);
-        return ResponseEntity.ok().build();
-    }
-
 //    @PostMapping("/{orderId}/ready")
 //    public ResponseEntity<Void> markReady(@PathVariable String orderId) {
 //        orderService.markReady(orderId);
