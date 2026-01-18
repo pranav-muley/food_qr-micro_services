@@ -1,11 +1,13 @@
 package com.festora.orderservice.consumer;
 
 import com.festora.orderservice.dto.InventoryReserveRequest;
+import com.festora.orderservice.dto.InventoryReservedEvent;
 import com.festora.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -13,17 +15,18 @@ import org.springframework.stereotype.Component;
 public class InventoryEventListener {
     private final OrderService orderService;
 
-//    @KafkaListener(topics = "inventory.temp_reserved", groupId = "order-group")
-//    public void onTempReserved(InventoryReserveRequest event) {
-//        log.info("Inventory reserved for order {}", event.getOrderId());
-//        orderService.markInventoryReserved(event);
-//    }
+    @KafkaListener(topics = "inventory.reservation-events", groupId = "order-group")
+    public void onTempReserved(InventoryReservedEvent event) {
+        if (ObjectUtils.isEmpty(event)) {
+            System.out.println("Inventory reservation request is empty");
+            return;
+        }
+        log.info("Inventory reserved for order {}", event.getOrderId());
+        orderService.markInventoryBasedOnStatus(event);
+    }
 
-
-//    @KafkaListener(topics = "inventory.failed", groupId = "order-group")
-//    public void onInventoryFailed(InventoryFailedEvent event) {
-//        log.warn("Inventory failed for order {}", event.getOrderId());
-//        orderService.markInventoryFailed(event.getOrderId());
-//    }
-
+    @KafkaListener(topics = "payment.events", groupId = "order-group")
+    public void paymentEvents(InventoryReserveRequest event) {
+        // TODO : Working on Payment service.
+    }
 }

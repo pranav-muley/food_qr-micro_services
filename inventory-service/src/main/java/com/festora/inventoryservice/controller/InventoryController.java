@@ -1,6 +1,6 @@
 package com.festora.inventoryservice.controller;
 
-import com.festora.inventoryservice.dto.InventoryReservationResponse;
+import com.festora.inventoryservice.dto.event.InventoryReservationEvent;
 import com.festora.inventoryservice.dto.InventoryReserveRequest;
 import com.festora.inventoryservice.service.InventoryService;
 import lombok.RequiredArgsConstructor;
@@ -14,20 +14,20 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    // ==============================
-    // TEMP RESERVE
-    // ==============================/inventory/temp-reserve
     @PostMapping("/temp-reserve")
-    public ResponseEntity<InventoryReservationResponse> tempReserve(
+    public ResponseEntity<InventoryReservationEvent> tempReserve(
             @RequestBody InventoryReserveRequest request
     ) {
-        InventoryReservationResponse response = inventoryService.tempReserve(request);
-        return ResponseEntity.ok(response);
+        try {
+            InventoryReservationEvent response = inventoryService.tempReserve(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    // ==============================
-    // CONFIRM AFTER PAYMENT
-    // ==============================
     @PostMapping("/confirm/{orderId}")
     public ResponseEntity<Void> confirm(@PathVariable String orderId) {
         inventoryService.confirmReservation(orderId);

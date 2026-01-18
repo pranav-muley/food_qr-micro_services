@@ -1,12 +1,19 @@
 server:
-  port: 8088
+  port: ${PORT:8087}
 
 spring:
-  application:
-    name: inventory-service
+  # =========================
+  # MONGODB
+  # =========================
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+
+    redis:
+      url: ${REDIS_URL}
 
   # =========================
-  # KAFKA (KEEP THIS)
+  # KAFKA (REDPANDA)
   # =========================
   kafka:
     bootstrap-servers: ${REDPANDA_BOOTSTRAP_SERVERS}
@@ -32,30 +39,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-  datasource:
-    url: ${POSTGRES_DB_URL:}
-    username: ${POSTGRES_USERNAME:}
-    password: ${POSTGRES_PASSWORD:}
-    driver-class-name: org.postgresql.Driver
-
-    hikari:
-      data-source-properties:
-        preferQueryMode: simple
-      maximum-pool-size: 5
-      minimum-idle: 1
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-
-  # =========================
-  # JPA / HIBERNATE
-  # =========================
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-
-  sql:
-    init:
-      mode: never
+# =========================
+# INVENTORY SERVICE CONFIG
+# =========================
+inventory:
+  service:
+    base-url: ${INVENTORY_SERVICE_URL}

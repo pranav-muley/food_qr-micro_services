@@ -1,9 +1,7 @@
 package com.festora.orderservice.service;
 
 import com.festora.orderservice.client.InventoryClient;
-import com.festora.orderservice.dto.CreateOrderRequest;
-import com.festora.orderservice.dto.GstResult;
-import com.festora.orderservice.dto.InventoryReserveRequest;
+import com.festora.orderservice.dto.*;
 import com.festora.orderservice.enums.OrderStatus;
 import com.festora.orderservice.gst.GstCalculator;
 import com.festora.orderservice.model.Order;
@@ -11,9 +9,9 @@ import com.festora.orderservice.model.OrderItem;
 import com.festora.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -72,27 +70,6 @@ public class OrderService {
         order.setUpdatedAt(now());
 
         return orderRepository.save(order);
-    }
-
-    /* ===============================
-       3️⃣ KITCHEN FLOW (NO KITCHEN SERVICE)
-       =============================== */
-    public void markPreparing(String orderId) {
-
-        Order order = get(orderId);
-
-        // POSTPAID: PAYMENT_PENDING → PREPARING
-        // PREPAID : PAID → PREPARING
-        if (order.getStatus() == OrderStatus.PAYMENT_PENDING ||
-                order.getStatus() == OrderStatus.PAID) {
-
-            order.setStatus(OrderStatus.PREPARING);
-            order.setUpdatedAt(now());
-            orderRepository.save(order);
-            return;
-        }
-
-        throw new IllegalStateException("Invalid state for PREPARING");
     }
 
     public void markServed(String orderId) {
@@ -246,18 +223,27 @@ public class OrderService {
         return orderRepository.findById(orderId).orElse(null);
     }
 
-    public void markInventoryReserved(InventoryReserveRequest request) {
+    public void markInventoryBasedOnStatus(InventoryReservedEvent request) {
         try {
-            // add item found in order
             String orderId = request.getOrderId();
+            String status = request.getStatus();
             Order order = getOrder(orderId);
-//           List<Items> items=  order.getItems().addAll(request.getItems());
-            order.setItems(order.getItems());
+            if (ObjectUtils.isEmpty(order)) {
+                System.out.println("Order not found for orderId : " + orderId);
+                return;
+            }
+            if ("TEMP_RESERVED".equalsIgnoreCase(status)) {
+                order.setStatus(OrderStatus.PREPARING);
+            } else {
+                System.out.println("Out of Stock inventory status : " + status);
+                order.setStatus(OrderStatus.REJECTED);
+            }
+            order.setUpdatedAt(now());
+            orderRepository.save(order);
         } catch (Exception e) {
             log.error("Inventory TEMP reserve failed for add-items {}", request, e);
             throw new IllegalStateException("ITEM_OUT_OF_STOCK");
         }
-
     }
 
     public List<Order> getAllPendingOrders() {
@@ -265,7 +251,7 @@ public class OrderService {
     }
 
     public Order markOrderConfirm(String orderId) throws Exception {
-        if (StringUtils.isEmpty(orderId)) {
+        if (StringUtils.isBlank(orderId)) {
             throw new Exception("Invalid order id");
         }
 
