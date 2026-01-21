@@ -3,7 +3,7 @@ package com.festora.inventoryservice.consumer;
 import com.festora.inventoryservice.dto.event.InventoryReservationEvent;
 import com.festora.inventoryservice.dto.InventoryReserveRequest;
 import com.festora.inventoryservice.dto.event.OrderCancelledEvent;
-import com.festora.inventoryservice.exception.OutOfStockException;
+import com.festora.inventoryservice.enums.ReservationStatus;
 import com.festora.inventoryservice.producer.InventoryEventProducer;
 import com.festora.inventoryservice.repo.InventoryReservationRepository;
 import com.festora.inventoryservice.service.InventoryService;
@@ -25,20 +25,11 @@ public class OrderCreatedListener {
     @KafkaListener(topics = "order.created", groupId = "inventory-group")
     public void handleOrderCreated(InventoryReserveRequest event) {
         try {
-            InventoryReservationEvent response = inventoryService.tempReserve(event);
-            eventProducer.publishReserved(response);
-
-        } catch (OutOfStockException ex) {
-            log.warn("Out of stock for order {}", event.getOrderId());
-
-            InventoryReservationEvent failedEvent = InventoryReservationEvent.builder()
-                    .orderId(event.getOrderId())
-                    .restaurantId(event.getRestaurantId())
-                    .reason("OUT_OF_STOCK")
-                    .build();
-
-            eventProducer.publishFailed(event.getOrderId(), failedEvent);
-
+            if (ObjectUtils.isEmpty(event) ||ObjectUtils.isEmpty(event.getOrderId())) {
+                log.error("Order id is empty");
+                return;
+            }
+            inventoryService.confirmReservation(event.getOrderId());
         } catch (Exception ex) {
             log.error("Unexpected error for order {}", event.getOrderId(), ex);
 
@@ -46,6 +37,7 @@ public class OrderCreatedListener {
                     .orderId(event.getOrderId())
                     .restaurantId(event.getRestaurantId())
                     .reason("INVENTORY_ERROR")
+                    .status(ReservationStatus.CANCELLED.name())
                     .build();
 
             eventProducer.publishFailed(event.getOrderId(), failedEvent);
