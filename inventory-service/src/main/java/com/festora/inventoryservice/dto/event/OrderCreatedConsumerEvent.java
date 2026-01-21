@@ -6,15 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class InventoryReservationEvent {
+@AllArgsConstructor
+public class OrderCreatedConsumerEvent {
     private String orderId;
     private Long restaurantId;
-    private String reservationId;
-    private String status;
-    private long expiresAt;
-    private String reason;
 }
-

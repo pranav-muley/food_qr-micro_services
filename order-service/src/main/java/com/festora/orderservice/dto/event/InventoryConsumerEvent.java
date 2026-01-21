@@ -1,4 +1,4 @@
-package com.festora.orderservice.dto;
+package com.festora.orderservice.dto.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class InventoryReservedEvent {
+public class InventoryConsumerEvent {
     private String orderId;
     private Long restaurantId;
     private String reservationId;
@@ -15,4 +15,3 @@ public class InventoryReservedEvent {
     private String expiresAt;
     private String reason;
 }
-

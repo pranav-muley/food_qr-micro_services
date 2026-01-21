@@ -2,14 +2,17 @@ package com.festora.orderservice.service;
 
 import com.festora.orderservice.client.InventoryClient;
 import com.festora.orderservice.dto.*;
+import com.festora.orderservice.dto.event.InventoryConsumerEvent;
+import com.festora.orderservice.dto.event.OrderCancelledProducerEvent;
+import com.festora.orderservice.dto.event.OrderCreatedProduceEvent;
 import com.festora.orderservice.enums.OrderStatus;
 import com.festora.orderservice.gst.GstCalculator;
 import com.festora.orderservice.model.Order;
 import com.festora.orderservice.model.OrderItem;
+import com.festora.orderservice.producer.OrderEventProduce;
 import com.festora.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -24,6 +27,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final InventoryClient inventoryClient;
     private final GstCalculator gstCalculator;
+    private final OrderEventProduce orderEventProduce;
 
     public Order createOrder(CreateOrderRequest req) throws Exception {
         if (ObjectUtils.isEmpty(req)) {
@@ -32,8 +36,6 @@ public class OrderService {
 
         Order order = buildOrder(req);
         orderRepository.save(order);
-
-        // 🔒 Initial inventory failure CAN cancel order
         try {
             inventoryClient.tempReserve(order);
             order.setStatus(OrderStatus.PENDING);
@@ -48,7 +50,7 @@ public class OrderService {
     }
 
     /* ===============================
-       2️⃣ ADD MORE ITEMS (SAFE)
+        ADD MORE ITEMS (SAFE)
        =============================== */
     public Order addItems(String orderId, List<OrderItem> newItems) {
 
@@ -132,8 +134,22 @@ public class OrderService {
         order.setReason(reason);
         order.setUpdatedAt(now());
         orderRepository.save(order);
+
+        OrderCancelledProducerEvent cancelEvent = buildOrderCancelledEvent(order);
+        if (org.apache.commons.lang3.ObjectUtils.isEmpty(cancelEvent))
+            orderEventProduce.publishOrderCancelledEvent(cancelEvent);
     }
 
+    private OrderCancelledProducerEvent buildOrderCancelledEvent(Order order) {
+        if (ObjectUtils.isEmpty(order)) {
+            return null;
+        }
+        return  OrderCancelledProducerEvent.builder()
+                .orderId(order.getOrderId())
+                .restaurantId(order.getRestaurantId())
+                .items(order.getItems())
+                .build();
+    }
     /* ===============================
        STATE TRANSITION GUARD
        =============================== */
@@ -223,7 +239,7 @@ public class OrderService {
         return orderRepository.findById(orderId).orElse(null);
     }
 
-    public void markInventoryBasedOnStatus(InventoryReservedEvent request) {
+    public void markInventoryBasedOnStatus(InventoryConsumerEvent request) {
         try {
             String orderId = request.getOrderId();
             String status = request.getStatus();
@@ -233,6 +249,11 @@ public class OrderService {
                 return;
             }
             if ("TEMP_RESERVED".equalsIgnoreCase(status)) {
+                OrderCreatedProduceEvent createdOrderEvent = OrderCreatedProduceEvent.builder()
+                        .orderId(orderId)
+                        .restaurantId(order.getRestaurantId())
+                        .build();
+                orderEventProduce.publishOrderCreatedEvent(createdOrderEvent);
                 order.setStatus(OrderStatus.PREPARING);
             } else {
                 System.out.println("Out of Stock inventory status : " + status);
@@ -250,23 +271,24 @@ public class OrderService {
         return orderRepository.findOrdersByStatus(OrderStatus.PENDING);
     }
 
-    public Order markOrderConfirm(String orderId) throws Exception {
-        if (StringUtils.isBlank(orderId)) {
-            throw new Exception("Invalid order id");
-        }
+//    public Order markOrderConfirm(String orderId) throws Exception {
+//        if (StringUtils.isBlank(orderId)) {
+//            throw new Exception("Invalid order id");
+//        }
+//
+//        Order order = orderRepository.findById(orderId).orElse(null);
+//
+//        if (order == null) {
+//            throw new Exception("Order not found");
+//        }
+//
+//        // confirm inventory ->
+//        inventoryClient.confirm(orderId);
+//
+//        // update status
+//        order.setStatus(OrderStatus.PREPARING);
+//        order.setUpdatedAt(now());
+//        return orderRepository.save(order);
+//    }
 
-        Order order = orderRepository.findById(orderId).orElse(null);
-
-        if (order == null) {
-            throw new Exception("Order not found");
-        }
-
-        // confirm inventory ->
-        inventoryClient.confirm(orderId);
-
-        // update status
-        order.setStatus(OrderStatus.PREPARING);
-        order.setUpdatedAt(now());
-        return orderRepository.save(order);
-    }
 }
