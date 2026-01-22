@@ -1,7 +1,7 @@
 package com.festora.orderservice.consumer;
 
 import com.festora.orderservice.dto.InventoryReserveRequest;
-import com.festora.orderservice.dto.InventoryReservedEvent;
+import com.festora.orderservice.dto.event.InventoryConsumerEvent;
 import com.festora.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ public class InventoryEventListener {
     private final OrderService orderService;
 
     @KafkaListener(topics = "inventory.reservation-events", groupId = "order-group")
-    public void onTempReserved(InventoryReservedEvent event) {
+    public void onTempReserved(InventoryConsumerEvent event) {
         if (ObjectUtils.isEmpty(event)) {
             System.out.println("Inventory reservation request is empty");
             return;
