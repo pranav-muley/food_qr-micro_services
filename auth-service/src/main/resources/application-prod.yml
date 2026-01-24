@@ -16,7 +16,7 @@ spring:
 
   data:
     redis:
-      url: ${SPRING_DATA_REDIS_URL:}
+      url: ${REDIS_URL:}
       timeout: 50s
 
 app:
