@@ -35,14 +35,8 @@ spring:
 
   data:
     redis:
-      #      host: ${REDIS_HOST:red-d5cjfjmuk2gs73857fc0}
-      #      port: ${REDIS_PORT:6379}
-      #      username: ${REDIS_USERNAME:red-d5cjfjmuk2gs73857fc0}
-      #      password: ${REDIS_PASSWORD:9MFMgCCAw4Yv80jsewERZafbBY8poTe9}
-      url: ${REDIS_URL:rediss://red-d5cjfjmuk2gs73857fc0:9MFMgCCAw4Yv80jsewERZafbBY8poTe9@singapore-keyvalue.render.com:6379}
-      timeout: 5000
-    ssl: false
-
+      url: ${SPRING_DATA_REDIS_URL:rediss://default:ASUXAAImcDE1ODdhYWZiYjE2MDA0YmIzYjEwYWU5OTQzMDU2OTZkZHAxOTQ5NQ@talented-fawn-9495.upstash.io:6379}
+      timeout: 50s
 
 app:
   qr:

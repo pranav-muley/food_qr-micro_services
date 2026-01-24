@@ -16,8 +16,8 @@ spring:
 
   data:
     redis:
-      url: ${REDIS_URL:rediss://red-d5cjfjmuk2gs73857fc0:9MFMgCCAw4Yv80jsewERZafbBY8poTe9@singapore-keyvalue.render.com:6379}
-      timeout: 5000
+      url: ${SPRING_DATA_REDIS_URL:}
+      timeout: 50s
 
 app:
   qr:
