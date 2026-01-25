@@ -13,6 +13,7 @@ import com.festora.orderservice.producer.OrderEventProduce;
 import com.festora.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -271,24 +272,24 @@ public class OrderService {
         return orderRepository.findOrdersByStatus(OrderStatus.PENDING);
     }
 
-//    public Order markOrderConfirm(String orderId) throws Exception {
-//        if (StringUtils.isBlank(orderId)) {
-//            throw new Exception("Invalid order id");
-//        }
-//
-//        Order order = orderRepository.findById(orderId).orElse(null);
-//
-//        if (order == null) {
-//            throw new Exception("Order not found");
-//        }
-//
-//        // confirm inventory ->
-//        inventoryClient.confirm(orderId);
-//
-//        // update status
-//        order.setStatus(OrderStatus.PREPARING);
-//        order.setUpdatedAt(now());
-//        return orderRepository.save(order);
-//    }
+    public Order markOrderConfirm(String orderId) throws Exception {
+        if (StringUtils.isBlank(orderId)) {
+            throw new Exception("Invalid order id");
+        }
+
+        Order order = orderRepository.findById(orderId).orElse(null);
+
+        if (order == null) {
+            throw new Exception("Order not found");
+        }
+
+        // confirm inventory ->
+        inventoryClient.confirm(orderId);
+
+        // update status
+        order.setStatus(OrderStatus.PREPARING);
+        order.setUpdatedAt(now());
+        return orderRepository.save(order);
+    }
 
 }

@@ -25,12 +25,17 @@ public class MenuItem {
 
     private String name;
     private String description;
+    private String imageUrl;
 
-    private Double basePrice;        // renamed from price
-
+    private Double basePrice;
     private Boolean veg;
-    private Boolean enabled;          // renamed from isAvailable
+    private Boolean enabled;
+
+    private Integer sortOrder;
 
     private List<Variant> variants;
     private List<Addon> addons;
+
+    private Long createdAt;
+    private Long updatedAt;
 }
