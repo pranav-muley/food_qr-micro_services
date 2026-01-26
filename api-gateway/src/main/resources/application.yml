@@ -4,13 +4,14 @@ server:
 spring:
   data:
     redis:
-      url: ${REDIS_URL:}
+      url: ${REDIS_URL:redis://localhost:6379}
       timeout: 50s
 
   cloud:
     gateway:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -25,18 +26,15 @@ spring:
             allowedHeaders:
               - "*"
             allowCredentials: true
+
       routes:
+        # ✅ PUBLIC AUTH ROUTES (NO RATE LIMITER)
         - id: auth-public
           uri: ${AUTH_SERVICE_URL}
           predicates:
             - Path=/auth/**,/session/**,/actuator/health
-          filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 20
-                redis-rate-limiter.burstCapacity: 40
-                key-resolver: "#{@ipKeyResolver}"
 
+        # ✅ ADMIN ROUTES (JWT + RATE LIMITER)
         - id: admin-protected
           uri: ${AUTH_SERVICE_URL}
           predicates:
@@ -45,20 +43,23 @@ spring:
             - JwtAuth
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 20
-                redis-rate-limiter.burstCapacity: 40
+                redis-rate-limiter.replenishRate: 50
+                redis-rate-limiter.burstCapacity: 100
                 key-resolver: "#{@ipKeyResolver}"
 
+        # MENU SERVICE
         - id: menu
           uri: ${MENU_SERVICE_URL}
           predicates:
             - Path=/menu/**
 
+        # CART SERVICE
         - id: cart
           uri: ${CART_SERVICE_URL}
           predicates:
             - Path=/cart/**
 
+        # ORDER SERVICE
         - id: order
           uri: ${ORDER_SERVICE_URL}
           predicates:

@@ -10,12 +10,13 @@ public class GatewayConfig {
 
     @Bean
     public KeyResolver ipKeyResolver() {
-        return exchange ->
-                Mono.just(
-                        exchange.getRequest()
-                                .getRemoteAddress()
-                                .getAddress()
-                                .getHostAddress()
-                );
+        return exchange -> {
+            String xff = exchange.getRequest().getHeaders().getFirst("X-Forwarded-For");
+            String ip = (xff != null && !xff.isBlank())
+                    ? xff.split(",")[0].trim()
+                    : "unknown";
+            return Mono.just(ip);
+        };
     }
+
 }
