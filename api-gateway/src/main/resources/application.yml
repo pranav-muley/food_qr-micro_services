@@ -5,8 +5,6 @@ spring:
   data:
     redis:
       url: ${REDIS_URL:}
-      ssl:
-        enabled: true
       timeout: 50s
 
   cloud:
