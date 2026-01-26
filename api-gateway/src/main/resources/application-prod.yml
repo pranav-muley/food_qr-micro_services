@@ -4,7 +4,7 @@ server:
 spring:
   data:
     redis:
-      url: ${REDIS_URL:redis://localhost:6379}
+      url: ${REDIS_URL:rediss://default:ASUXAAImcDE1ODdhYWZiYjE2MDA0YmIzYjEwYWU5OTQzMDU2OTZkZHAxOTQ5NQ@talented-fawn-9495.upstash.io:6379}
       timeout: 50s
 
   cloud:
@@ -30,13 +30,13 @@ spring:
       routes:
         # ✅ PUBLIC AUTH ROUTES (NO RATE LIMITER)
         - id: auth-public
-          uri: ${AUTH_SERVICE_URL}
+          uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/auth/**,/session/**,/actuator/health
 
         # ✅ ADMIN ROUTES (JWT + RATE LIMITER)
         - id: admin-protected
-          uri: ${AUTH_SERVICE_URL}
+          uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/admin/**
           filters:
@@ -49,19 +49,19 @@ spring:
 
         # MENU SERVICE
         - id: menu
-          uri: ${MENU_SERVICE_URL}
+          uri: ${MENU_SERVICE_URL:http://localhost:8085}
           predicates:
             - Path=/menu/**
 
         # CART SERVICE
         - id: cart
-          uri: ${CART_SERVICE_URL}
+          uri: ${CART_SERVICE_URL:http://localhost:8086}
           predicates:
             - Path=/cart/**
 
         # ORDER SERVICE
         - id: order
-          uri: ${ORDER_SERVICE_URL}
+          uri: ${ORDER_SERVICE_URL:http://localhost:8089}
           predicates:
             - Path=/order/**
 

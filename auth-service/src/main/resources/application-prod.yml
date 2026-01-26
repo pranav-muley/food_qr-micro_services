@@ -16,7 +16,7 @@ spring:
 
   data:
     redis:
-      url: ${REDIS_URL:}
+      url: ${REDIS_URL:rediss://default:ASUXAAImcDE1ODdhYWZiYjE2MDA0YmIzYjEwYWU5OTQzMDU2OTZkZHAxOTQ5NQ@talented-fawn-9495.upstash.io:6379}
       timeout: 50s
 
 app:
