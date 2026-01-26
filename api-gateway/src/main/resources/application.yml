@@ -2,6 +2,11 @@ server:
   port: 8080
 
 spring:
+  data:
+    redis:
+      url: ${REDIS_URL:}
+      timeout: 50s
+
   cloud:
     gateway:
       routes:
