@@ -1,4 +1,3 @@
-
 server:
   port: ${PORT:8080}
 
@@ -6,10 +5,28 @@ spring:
   data:
     redis:
       url: ${REDIS_URL:}
+      ssl:
+        enabled: true
       timeout: 50s
 
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
       routes:
         - id: auth-public
           uri: ${AUTH_SERVICE_URL}
