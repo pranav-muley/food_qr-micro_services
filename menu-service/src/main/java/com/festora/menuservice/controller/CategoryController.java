@@ -2,26 +2,28 @@ package com.festora.menuservice.controller;
 
 import com.festora.menuservice.dto.CategoryDto;
 import com.festora.menuservice.service.CategoryService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
+@RequiredArgsConstructor
 public class CategoryController {
+
     private final CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
+    @GetMapping
+    public List<CategoryDto> getCategories(@RequestParam Long restaurantId) {
+        return categoryService.getCategories(restaurantId);
     }
 
-    @GetMapping("/get")
-    public List<CategoryDto> getCategories(
-            @RequestParam Long restaurantId
+    @PostMapping
+    public CategoryDto createCategory(
+            @RequestParam Long restaurantId,
+            @RequestBody CategoryDto dto
     ) {
-        return categoryService.getCategories(restaurantId);
+        return categoryService.createCategory(restaurantId, dto);
     }
 }

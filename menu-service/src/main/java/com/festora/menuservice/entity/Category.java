@@ -7,11 +7,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
+@Document("categories")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document("categories")
 public class Category {
 
     @Id
@@ -22,4 +22,9 @@ public class Category {
 
     private String name;
     private String description;
+
+    private Integer sortOrder;
+
+    private Long createdAt;
+    private Long updatedAt;
 }

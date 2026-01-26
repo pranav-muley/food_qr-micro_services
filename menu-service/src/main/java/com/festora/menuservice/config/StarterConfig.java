@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.festora.menuservice.entity.Category;
 import com.festora.menuservice.entity.MenuItem;
-import com.festora.menuservice.repository.CategoryRepo;
+import com.festora.menuservice.repository.CategoryRepository;
 import com.festora.menuservice.repository.MenuItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -18,7 +18,7 @@ import java.util.List;
 public class StarterConfig implements CommandLineRunner {
 
     private final MenuItemRepository menuRepo;
-    private final CategoryRepo categoryRepo;
+    private final CategoryRepository categoryRepo;
     private final ObjectMapper objectMapper;
 
     @Override

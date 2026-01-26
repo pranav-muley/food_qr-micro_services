@@ -1,26 +1,15 @@
 package com.festora.menuservice.repository;
 
 import com.festora.menuservice.entity.MenuItem;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-import org.springframework.data.domain.Page;
-
+import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface MenuItemRepository extends MongoRepository<MenuItem, String> {
+    List<MenuItem> findByRestaurantIdAndCategoryId(Long restaurantId, String categoryId);
 
-    Page<MenuItem> findByRestaurantIdAndCategoryId(
-            Long restaurantId,
-            String categoryId,
-            Pageable pageable
-    );
-
-    Optional<MenuItem> findByIdAndRestaurantId(
-            String id,
-            Long restaurantId
-    );
+    Optional<MenuItem> findByIdAndRestaurantId(String id, Long restaurantId);
 }
-
-
-

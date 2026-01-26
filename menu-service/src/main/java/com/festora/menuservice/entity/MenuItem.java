@@ -23,13 +23,15 @@ public class MenuItem {
     @Indexed
     private String categoryId;
 
+    @Indexed
+    private Boolean enabled;
+
     private String name;
     private String description;
     private String imageUrl;
 
     private Double basePrice;
     private Boolean veg;
-    private Boolean enabled;
 
     private Integer sortOrder;
 

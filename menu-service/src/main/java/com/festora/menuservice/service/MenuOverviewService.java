@@ -2,16 +2,20 @@ package com.festora.menuservice.service;
 
 import com.festora.menuservice.dto.CategoryDto;
 import com.festora.menuservice.dto.CategoryMenuResponse;
+import com.festora.menuservice.dto.MenuItemDto;
 import com.festora.menuservice.entity.Category;
+import com.festora.menuservice.entity.MenuItem;
 import com.festora.menuservice.mapper.MenuMapper;
-import com.festora.menuservice.repository.CategoryRepo;
+import com.festora.menuservice.repository.CategoryRepository;
 import com.festora.menuservice.repository.MenuItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,7 +24,7 @@ public class MenuOverviewService {
 
     private static final int PREVIEW_LIMIT = 5;
 
-    private final CategoryRepo categoryRepo;
+    private final CategoryRepository categoryRepo;
     private final MenuItemRepository itemRepo;
     private final MenuMapper menuMapper;
 
@@ -31,7 +35,7 @@ public class MenuOverviewService {
     public CategoryMenuResponse getMenuOverview(Long restaurantId) {
 
         List<Category> categories =
-                categoryRepo.findByRestaurantId(restaurantId);
+                categoryRepo.findByRestaurantIdOrderBySortOrderAsc(restaurantId);
 
         List<CategoryDto> categoryDtos =
                 categories.stream()
@@ -55,21 +59,18 @@ public class MenuOverviewService {
                 .build();
     }
 
-    private List<com.festora.menuservice.dto.MenuItemDto> loadPreviewItems(
+    private List<MenuItemDto> loadPreviewItems(
             Long restaurantId,
             String categoryId
     ) {
-        return itemRepo
-                .findByRestaurantIdAndCategoryId(
-                        restaurantId,
-                        categoryId,
-                        PageRequest.of(
-                                0,
-                                PREVIEW_LIMIT,
-                                Sort.by("name").ascending()
-                        )
-                )
-                .map(menuMapper::toMenuItemDto)
-                .getContent();
+       List<MenuItem> menuItems = itemRepo.findByRestaurantIdAndCategoryId(restaurantId, categoryId);
+       if (CollectionUtils.isEmpty(menuItems)) {
+           return new ArrayList<>();
+       }
+       List<MenuItemDto> menuItemDtos = new ArrayList<>();
+       menuItems.forEach(menuItem -> {
+           menuItemDtos.add(menuMapper.toMenuItemDto(menuItem));
+       });
+       return menuItemDtos;
     }
 }
