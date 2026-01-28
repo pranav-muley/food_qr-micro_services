@@ -6,7 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +27,14 @@ public class OwnerService {
                 throw new FileAlreadyExistsException("Table mapping already exists");
             }
             tableMapping = new QrTableMapping();
+            tableMapping.setQrId(UUID.randomUUID().toString());
             tableMapping.setRestaurantId(restaurantId);
-            tableMapping.setTableNumber(String.valueOf(tableNumber));
-            QrTableMapping savedModel = qrTableMappingRepository.save(tableMapping);
-            if (ObjectUtils.isEmpty(savedModel)) {
-                throw new IllegalArgumentException("Something went wrong, while saving table mapping");
-            }
-            return generatingUrlForQR(savedModel.getQrId());
+            tableMapping.setTableNumber(tableNumber);
+            tableMapping.setActive(true);
+
+            QrTableMapping saved = qrTableMappingRepository.save(tableMapping);
+
+            return generatingUrlForQR(saved.getQrId());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -41,6 +45,6 @@ public class OwnerService {
             throw new IllegalArgumentException("qrId must not be null or empty");
         }
 
-        return "http://frontendUrl?qrId=" + qrId;
+        return "http://frontendUrl?qrId=" + URLEncoder.encode(qrId, StandardCharsets.UTF_8);
     }
 }

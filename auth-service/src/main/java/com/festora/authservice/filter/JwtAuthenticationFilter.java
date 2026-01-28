@@ -22,6 +22,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
+
+        return path.startsWith("/auth/login")
+                || path.startsWith("/auth/register")
+                || path.startsWith("/session/")
+                || path.startsWith("/health");
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -47,6 +62,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     userId,
                     null,
                     List.of(() -> "ROLE_" + role)
+            );
+
+            request.setAttribute(
+                    "restaurantId",
+                    claims.get("restaurantId", Long.class)
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
