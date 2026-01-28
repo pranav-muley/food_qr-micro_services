@@ -25,7 +25,7 @@ public class SessionJwtUtil {
     public String createSessionToken(
             String sessionId,
             Long restaurantId,
-            String table
+            Integer table
     ) {
         long now = System.currentTimeMillis();
 
