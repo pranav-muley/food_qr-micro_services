@@ -22,11 +22,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws java.io.IOException, jakarta.servlet.ServletException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response, FilterChain filterChain) throws java.io.IOException, jakarta.servlet.ServletException {
 
         String authHeader = request.getHeader("Authorization");
 
@@ -47,6 +44,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     userId,
                     null,
                     List.of(() -> "ROLE_" + role)
+            );
+
+            request.setAttribute(
+                    "restaurantId",
+                    claims.get("restaurantId", Long.class)
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);

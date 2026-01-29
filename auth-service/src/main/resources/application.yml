@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: ${PORT:8080}
 
 spring:
   datasource:
@@ -17,25 +17,15 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
 
-  # =========================
-  # JPA / HIBERNATE
-  # =========================
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-  sql:
-    init:
-      mode: never
-
-  application:
-    name: auth-service
-
   data:
     redis:
-      url: ${SPRING_DATA_REDIS_URL:}
+      url: ${REDIS_URL:rediss://default:ASUXAAImcDE1ODdhYWZiYjE2MDA0YmIzYjEwYWU5OTQzMDU2OTZkZHAxOTQ5NQ@talented-fawn-9495.upstash.io:6379}
       timeout: 50s
 
 app:
@@ -43,21 +33,9 @@ app:
     secret: ${APP_QR_SECRET:"TnsLD53NKeFsHhZ73ojREN9XLT8dIuuvmeSh/f3FU2KF7q4m11nf/PJivEuplO9U4tZDUW0JPPByW2VHOU2HMQ=="}
     token_ttl_seconds: 600   # QR token TTL (seconds) e.g. 10 minutes
   session:
-    secret: ${APP_SESSION_SECRET:dev-session-secret-32-bytes-long}
-    ttl-seconds: 21600       # session TTL for Redis
-    token-ttl-seconds: 1800  # session JWT lifetime (seconds)
-
-#  session:
-#    ttl-seconds: 21600         # 6 hours
-#    token-ttl-seconds: 1800    # session JWT lifetime (30 minutes)
-#  keys:
-#    # file paths (can be absolute or classpath:)
-#    session-private-key-file: ${APP_SESSION_PRIVATE_KEY:/run/secrets/auth_session_private.pem}
-#    session-public-key-file:  ${APP_SESSION_PUBLIC_KEY:/run/secrets/auth_session_public.pem}
-#    qr-public-key-file:       ${APP_QR_PUBLIC_KEY:/run/secrets/qr_public.pem}
-#    # Key IDs (kid) used in JWT headers (optional)
-#    session-kid: "session-key-1"
-
+    secret: ${APP_SESSION_SECRET:mysupersecuresecretkey1234567890!!!}
+    ttl-seconds: 21600
+    token-ttl-seconds: 1800
 
 jwt:
   issuer: festora-auth
@@ -104,3 +82,13 @@ jwt:
     avlsAEW0iAa9oxoC5CuThwz89tspWPqeMJwGmxVmWGZ71Q3rUtDOOOMXeWBLWRJ2
     3kKB+axGNif3btVLQFU5ThQR
     -----END PRIVATE KEY-----
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always

@@ -31,7 +31,6 @@ public class CustomerSessionService {
         }
 
         final QrTableMapping qr = qrRepo.findById(qrId)
-                .filter(QrTableMapping::isActive)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid QR"));
 
         final long ttl = SESSION_TTL_SECONDS;
@@ -57,8 +56,8 @@ public class CustomerSessionService {
         sessionId = UUID.randomUUID().toString();
         final String sessionKey = "session:" + sessionId;
 
-        Map<String, String> sessionData = Map.of(
-                "restaurantId", qr.getRestaurantId().toString(),
+        Map<String, Object> sessionData = Map.of(
+                "restaurantId", qr.getRestaurantId(),
                 "tableNumber", qr.getTableNumber(),
                 "deviceId", deviceId
         );

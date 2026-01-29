@@ -1,27 +1,33 @@
 package com.festora.authservice.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.UuidGenerator;
 
-@Entity
-@Table(name = "qr_table_mapping")
+import java.util.UUID;
+
 @Data
+@Entity
+@Table(
+        name = "qr_table_mapping",
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"restaurant_id", "table_number"}
+        )
+)
 public class QrTableMapping {
 
     @Id
-    @Column(length = 40)
-    private String qrId;            // e.g. Qr_9xA72
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, unique = true)
+    private String qrId;
 
     @Column(nullable = false)
     private Long restaurantId;
 
     @Column(nullable = false)
-    private String tableNumber;
+    private Integer tableNumber;
 
-    @Column(nullable = false)
-    private boolean active = true;
+    private Boolean active = true;
 }
-
