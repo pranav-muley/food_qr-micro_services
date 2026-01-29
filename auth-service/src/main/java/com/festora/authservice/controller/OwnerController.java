@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/qr")
@@ -20,24 +18,21 @@ public class OwnerController {
 
     private final OwnerService ownerService;
 
-    @GetMapping("/table")
-    public ResponseEntity<?> generateQRUrl(
-            HttpServletRequest request,
-            @RequestParam Integer tableNumber
-    ) {
+    @GetMapping("/tables/bulk")
+    public ResponseEntity<?> generateBulk(HttpServletRequest request, @RequestParam Integer start, @RequestParam Integer end) {
+
+        Long restaurantId = (Long) request.getAttribute("restaurantId");
+
+        if (restaurantId == null) {
+            return ResponseEntity.status(401).build();
+        }
+
         try {
-            Long restaurantId = (Long) request.getAttribute("restaurantId");
+            List<String> urls =
+                    ownerService.generateUrlsInBulk(restaurantId, start, end);
+            return ResponseEntity.ok(urls);
 
-            if (restaurantId == null) {
-                return ResponseEntity.status(401).body("Unauthorized");
-            }
-
-            String generatedUrl = ownerService.getMappingRestaurantAndTable(restaurantId, tableNumber);
-            System.out.println(generatedUrl);
-            return ResponseEntity.ok(generatedUrl);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

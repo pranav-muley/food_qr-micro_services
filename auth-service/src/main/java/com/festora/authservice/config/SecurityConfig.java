@@ -33,8 +33,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/login",
-                                "/auth/register",
+                                "/login",
+                                "/register",
                                 "/health",
                                 "/session/**"
                         ).permitAll()
